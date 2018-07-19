@@ -17,6 +17,13 @@ ${tender_data_decisions[0].decisionDate}  xpath=//div[@tid='decision.date']
 ${tender_data_decisions[0].decisionID}  xpath=//div[@tid='decision.id']
 ${tender_data_assetHolder.name}  xpath=//div[@tid='assetHolder.name']
 
+${tender_data.assets.description}  div[@tid="item.description"]
+${tender_data.assets.classification.scheme}  span[@tid="item.classification.scheme"]
+${tender_data.assets.classification.id}  span[@tid="item.classification.id"]
+${tender_data.assets.unit.name}  span[@tid="item.unit.name"]
+${tender_data.assets.quantity}  span[@tid="item.quantity"]
+${tender_data.assets.registrationDetails.status}  span[@tid="item.classification.scheme"]
+
 
 *** Keywords ***
 Підготувати клієнт для користувача
@@ -156,6 +163,7 @@ ${tender_data_assetHolder.name}  xpath=//div[@tid='assetHolder.name']
 Пошук об’єкта МП по ідентифікатору
   [Arguments]  ${user_name}  ${tender_id}
   Wait For Auction  ${tender_id}
+  Wait For Ajax
   Wait Enable And Click Element  css=div[tid='${tender_id}']
   Wait Until element Is Visible  css=div[tid='data.title']  ${COMMONWAIT}
 
@@ -194,6 +202,19 @@ ${tender_data_assetHolder.name}  xpath=//div[@tid='assetHolder.name']
   ${year}=  Set Variable  ${result_full[2]}
   ${result_full}=  Set Variable  ${year}-${month}-${day} ${result_full[2]}
   [Return]  ${result_full}
+
+
+Отримати інформацію з активу об'єкта МП
+  [Arguments]  ${username}  ${tender_id}  ${object_id}  ${field_name}
+  ${element}=  Convert To String  assets.${field_name}
+  ${element_for_work}=  Set variable  xpath=//div[@ng-repeat='item in data.items' and contains(., '${object_id}')]//${tender_data.${element}}
+  Wait For Element With Reload  ${element_for_work}
+
+  Run Keyword And Return If  '${field_name}' == 'quantity'  Отримати число  ${element_for_work}
+
+  Wait Until Element Is Visible  ${element_for_work}  timeout=${COMMONWAIT}
+  ${result}=  Отримати текст елемента  ${element_for_work}
+  [Return]  ${result}
 
 
 Login
@@ -258,16 +279,14 @@ Try Search Auction
   [Arguments]  ${tender_id}
   Wait For Ajax
   Wait Until element Is Enabled  css=input[tid='global.search']  ${COMMONWAIT}
-
-  #заполним поле поиска
   ${text_in_search}=  Get Value  css=input[tid='global.search']
+
   Run Keyword Unless  '${tender_id}' == '${text_in_search}'  Run Keywords  Clear Element Text  css=input[tid='global.search']
   ...  AND  Input Text  css=input[tid='global.search']  ${tender_id}
 
-  #выполним поиск
   Press Key  css=input[tid='global.search']  \\13
-  Wait Until Element Is Not Visible  css=div.progress.progress-bar  ${COMMONWAIT}
-  Wait Until Element Is Not Visible  css=div[role='dialog']  ${COMMONWAIT}
+  Wait Until Element Is Not Visible  css=div.progress.progress-bar  15s
+  Wait Until Element Is Not Visible  css=div[role='dialog']  15s
   Wait Until Element Is Visible  css=div[tid='${tender_id}']  ${COMMONWAIT}
   [Return]  True
 
@@ -284,3 +303,25 @@ Try Search Element
   Wait Until Element Is Visible  ${locator}  7
   Wait Until Element Is Enabled  ${locator}  5
   [Return]  True
+
+
+Отримати текст елемента
+  [Arguments]  ${element_name}
+  ${temp_name}=  Remove String  ${element_name}  '
+  ${selector}=  Set Variable If
+  ...  'css=' in '${temp_name}' or 'xpath=' in '${temp_name}'  ${element_name}
+  ...  ${tender_data.${element_name}}
+
+  Wait Until Element Is Visible  ${selector}
+  ${result_full}=  Get Text  ${selector}
+  ${result}=  Strip String  ${result_full}
+  [Return]  ${result}
+
+
+Отримати число
+  [Arguments]  ${element_name}
+  ${value}=  Отримати текст елемента  ${element_name}
+  ${value}=  Replace String  ${value}  ${SPACE}  ${EMPTY}
+  ${value}=  Replace String  ${value}  ,  .
+  ${result}=  Convert To Number  ${value}
+  [Return]  ${result}
