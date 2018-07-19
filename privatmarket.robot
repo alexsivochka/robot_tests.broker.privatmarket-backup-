@@ -16,6 +16,11 @@ ${tender_data_decisions[0].title}  xpath=//div[@tid='decision.title']
 ${tender_data_decisions[0].decisionDate}  xpath=//div[@tid='decision.date']
 ${tender_data_decisions[0].decisionID}  xpath=//div[@tid='decision.id']
 ${tender_data_assetHolder.name}  xpath=//div[@tid='assetHolder.name']
+${tender_data_assetHolder.identifier.id}  xpath=//div[@tid='assetHolder.identifier.id']
+
+${tender_data_assetCustodian.contactPoint.name}  xpath=//div[@tid='data.assetCustodian.contactPoint.name']
+${tender_data_assetCustodian.contactPoint.telephone}  xpath=//div[@tid='data.assetCustodian.contactPoint.telephone']
+${tender_data_assetCustodian.contactPoint.email}  xpath=//div[@tid='data.assetCustodian.contactPoint.email']
 
 ${tender_data.assets.description}  div[@tid="item.description"]
 ${tender_data.assets.classification.scheme}  span[@tid="item.classification.scheme"]
@@ -168,6 +173,19 @@ ${tender_data.assets.registrationDetails.status}  span[@tid="item.classification
   Wait Until element Is Visible  css=div[tid='data.title']  ${COMMONWAIT}
 
 
+Отримати інформацію з активу об'єкта МП
+  [Arguments]  ${username}  ${tender_id}  ${object_id}  ${field_name}
+  ${element}=  Convert To String  assets.${field_name}
+  ${element_for_work}=  Set variable  xpath=//div[@ng-repeat='item in data.items' and contains(., '${object_id}')]//${tender_data.${element}}
+  Wait For Element With Reload  ${element_for_work}
+
+  Run Keyword And Return If  '${field_name}' == 'quantity'  Отримати число  ${element_for_work}
+
+  Wait Until Element Is Visible  ${element_for_work}  timeout=${COMMONWAIT}
+  ${result}=  Отримати текст елемента  ${element_for_work}
+  [Return]  ${result}
+
+
 Отримати інформацію із об'єкта МП
   [Arguments]  ${user_name}  ${tender_id}  ${field_name}
   Run Keyword And Return If  '${field_name}' == 'status'  Отримати status об'єкту МП  ${field_name}
@@ -186,7 +204,12 @@ ${tender_data.assets.registrationDetails.status}  span[@tid="item.classification
   ${element_text}=  Get Text  xpath=//span[@tid='data.statusName']/span[1]
   ${text}=  Strip String  ${element_text}
   ${result}=  Set Variable If
+  ...  '${text}' == 'Чернетка'  draft
   ...  '${text}' == 'Опубліковано. Очікування інформаційного повідомлення'  pending
+  ...  '${text}' == 'Публікація інформаційного повідомлення'  verification
+  ...  '${text}' == 'Інформаційне повідомлення опубліковано'  active
+  ...  '${text}' == 'Аукціон завершено'  complete
+  ...  '${text}' == 'Виключено з переліку'  deleted
   ...  ${element}
   [Return]  ${result}
 
@@ -202,19 +225,6 @@ ${tender_data.assets.registrationDetails.status}  span[@tid="item.classification
   ${year}=  Set Variable  ${result_full[2]}
   ${result_full}=  Set Variable  ${year}-${month}-${day} ${result_full[2]}
   [Return]  ${result_full}
-
-
-Отримати інформацію з активу об'єкта МП
-  [Arguments]  ${username}  ${tender_id}  ${object_id}  ${field_name}
-  ${element}=  Convert To String  assets.${field_name}
-  ${element_for_work}=  Set variable  xpath=//div[@ng-repeat='item in data.items' and contains(., '${object_id}')]//${tender_data.${element}}
-  Wait For Element With Reload  ${element_for_work}
-
-  Run Keyword And Return If  '${field_name}' == 'quantity'  Отримати число  ${element_for_work}
-
-  Wait Until Element Is Visible  ${element_for_work}  timeout=${COMMONWAIT}
-  ${result}=  Отримати текст елемента  ${element_for_work}
-  [Return]  ${result}
 
 
 Login
