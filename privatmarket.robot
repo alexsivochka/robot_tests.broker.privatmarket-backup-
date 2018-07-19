@@ -16,6 +16,11 @@ ${tender_data_decisions[0].title}  xpath=//div[@tid='decision.title']
 ${tender_data_decisions[0].decisionDate}  xpath=//div[@tid='decision.date']
 ${tender_data_decisions[0].decisionID}  xpath=//div[@tid='decision.id']
 ${tender_data_assetHolder.name}  xpath=//div[@tid='assetHolder.name']
+${tender_data_assetHolder.identifier.id}  xpath=//div[@tid='assetHolder.identifier.id']
+
+${tender_data_assetCustodian.contactPoint.name}  xpath=//div[@tid='data.assetCustodian.contactPoint.name']
+${tender_data_assetCustodian.contactPoint.telephone}  xpath=//div[@tid='data.assetCustodian.contactPoint.telephone']
+${tender_data_assetCustodian.contactPoint.email}  xpath=//div[@tid='data.assetCustodian.contactPoint.email']
 
 
 *** Keywords ***
@@ -178,7 +183,12 @@ ${tender_data_assetHolder.name}  xpath=//div[@tid='assetHolder.name']
   ${element_text}=  Get Text  xpath=//span[@tid='data.statusName']/span[1]
   ${text}=  Strip String  ${element_text}
   ${result}=  Set Variable If
+  ...  '${text}' == 'Чернетка'  draft
   ...  '${text}' == 'Опубліковано. Очікування інформаційного повідомлення'  pending
+  ...  '${text}' == 'Публікація інформаційного повідомлення'  verification
+  ...  '${text}' == 'Інформаційне повідомлення опубліковано'  active
+  ...  '${text}' == 'Аукціон завершено'  complete
+  ...  '${text}' == 'Виключено з переліку'  deleted
   ...  ${element}
   [Return]  ${result}
 
