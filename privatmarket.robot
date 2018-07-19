@@ -8,6 +8,14 @@ Library  BuiltIn
 *** Variables ***
 ${COMMONWAIT}  8
 
+${tender_data_assetID}  xpath=//div[@tid='assetID']
+${tender_data_title}  xpath=//div[@tid='data.title']
+${tender_data_description}  xpath=//div[@tid='description']
+
+${tender_data_decisions[0].title}  xpath=//div[@tid='decision.title']
+${tender_data_decisions[0].decisionDate}  xpath=//div[@tid='decision.date']
+${tender_data_decisions[0].decisionID}  xpath=//div[@tid='decision.id']
+${tender_data_assetHolder.name}  xpath=//div[@tid='assetHolder.name']
 
 
 *** Keywords ***
@@ -143,6 +151,42 @@ ${COMMONWAIT}  8
   Wait For Auction  ${tender_id}
   Wait Enable And Click Element  css=div[tid='${tender_id}']
   Wait Until element Is Visible  css=div[tid='data.title']  ${COMMONWAIT}
+
+
+Отримати інформацію із об'єкта МП
+  [Arguments]  ${user_name}  ${tender_id}  ${field_name}
+  Run Keyword And Return If  '${field_name}' == 'status'  Отримати status об'єкту МП  ${field_name}
+  Run Keyword And Return If  '${field_name}' == 'decisions[0].decisionDate'  Отримати дату  ${field_name}
+
+  Wait Until Element Is Visible  ${tender_data_${field_name}}
+  ${result_full}=  Get Text  ${tender_data_${field_name}}
+  ${result}=  Strip String  ${result_full}
+  [Return]  ${result}
+
+
+Отримати status об'єкту МП
+  [Arguments]  ${element}
+  Reload Page
+  Sleep  5s
+  ${element_text}=  Get Text  xpath=//span[@tid='data.statusName']/span[1]
+  ${text}=  Strip String  ${element_text}
+  ${result}=  Set Variable If
+  ...  '${text}' == 'Опубліковано. Очікування інформаційного повідомлення'  pending
+  ...  ${element}
+  [Return]  ${result}
+
+
+Отримати дату
+  [Arguments]  ${element_name}
+  Switch Browser  ${ALIAS_NAME}
+  ${result_full}=  Get Text  ${element_name}
+  ${result_full}=  Split String  ${result_full}  '-'
+  ${day_length}=  Get Length  ${result_full[0]}
+  ${day}=  Set Variable If  '${day_length}' == '1'  0${result_full[0]}  ${result_full[0]}
+  ${month}=  Set Variable  ${result_full[1]}
+  ${year}=  Set Variable  ${result_full[2]}
+  ${result_full}=  Set Variable  ${year}-${month}-${day} ${result_full[2]}
+  [Return]  ${result_full}
 
 
 Login
