@@ -15,12 +15,17 @@ ${tender_data_description}  xpath=//div[@tid='description']
 ${tender_data_decisions[0].title}  xpath=//div[@tid='decision.title']
 ${tender_data_decisions[0].decisionDate}  xpath=//div[@tid='decision.date']
 ${tender_data_decisions[0].decisionID}  xpath=//div[@tid='decision.id']
+
 ${tender_data_assetHolder.name}  xpath=//div[@tid='assetHolder.name']
 ${tender_data_assetHolder.identifier.id}  xpath=//div[@tid='assetHolder.identifier.id']
+${tender_data_assetHolder.identifier.scheme}  xpath=//div[@tid='assetHolder.identifier.scheme']
 
 ${tender_data_assetCustodian.contactPoint.name}  xpath=//div[@tid='data.assetCustodian.contactPoint.name']
 ${tender_data_assetCustodian.contactPoint.telephone}  xpath=//div[@tid='data.assetCustodian.contactPoint.telephone']
 ${tender_data_assetCustodian.contactPoint.email}  xpath=//div[@tid='data.assetCustodian.contactPoint.email']
+${tender_data_assetCustodian.identifier.scheme}  xpath=//div[@tid='data.assetCustodian.identifier.scheme']
+${tender_data_assetCustodian.identifier.id}  xpath=//div[@tid='data.assetCustodian.identifier.id']
+${tender_data_assetCustodian.identifier.legalName}  xpath=//div[@tid='data.assetCustodian.identifier.legalName']
 
 ${tender_data.assets.description}  div[@tid="item.description"]
 ${tender_data.assets.classification.scheme}  span[@tid="item.classification.scheme"]
@@ -203,6 +208,7 @@ ${tender_data.assets.registrationDetails.status}  span[@tid="item.classification
   Sleep  5s
   ${element_text}=  Get Text  xpath=//span[@tid='data.statusName']/span[1]
   ${text}=  Strip String  ${element_text}
+  ${text}=  Replace String  ${text}  ${\n}  ${EMPTY}
   ${result}=  Set Variable If
   ...  '${text}' == 'Чернетка'  draft
   ...  '${text}' == 'Опубліковано. Очікування інформаційного повідомлення'  pending
@@ -215,15 +221,10 @@ ${tender_data.assets.registrationDetails.status}  span[@tid="item.classification
 
 
 Отримати дату
-  [Arguments]  ${element_name}
+  [Arguments]  ${field_name}
   Switch Browser  ${ALIAS_NAME}
-  ${result_full}=  Get Text  ${element_name}
-  ${result_full}=  Split String  ${result_full}  '-'
-  ${day_length}=  Get Length  ${result_full[0]}
-  ${day}=  Set Variable If  '${day_length}' == '1'  0${result_full[0]}  ${result_full[0]}
-  ${month}=  Set Variable  ${result_full[1]}
-  ${year}=  Set Variable  ${result_full[2]}
-  ${result_full}=  Set Variable  ${year}-${month}-${day} ${result_full[2]}
+  ${result_full}=  Get Text  ${tender_data_${field_name}}
+  ${result_full}=  Convert Date  ${result_full}  date_format=%d-%m-%Y
   [Return]  ${result_full}
 
 
