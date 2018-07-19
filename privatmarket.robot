@@ -93,11 +93,24 @@ ${tender_data_assetHolder.name}  xpath=//div[@tid='assetHolder.name']
   \  ${should_we_click_btn_add_item}=  Set Variable If  '0' != '${index}'  ${True}  ${False}
   \  Додати об'єкт продажу  ${items[${index}]}  ${should_we_click_btn_add_item}
 
+  Click Button  css=button[tid="btn.createasset"]
+  Wait For Ajax
+  Wait Until Element Is Not Visible  css=div.progress.progress-bar  ${COMMONWAIT}
+  Wait Until Element Is Visible  css=div[tid='data.title']  ${COMMONWAIT}
+  Wait For Ajax
+  Wait Enable And Click Element  css=button[tid="btn.publicateLot"]
+  Wait For Ajax
+  Wait For Element With Reload  xpath=//div[contains(@tid, 'assetID') and contains(., 'UA-')]
+  ${tender_id}=  Get Text  css=div[tid='assetID']
+  Go To  ${USERS.users['${username}'].homepage}
+  Wait For Ajax
+  [Return]  ${tender_id}
+
 
 Додати рішення
   [Arguments]  ${decision}  ${should_we_click_btn_add_decision}=${False}
   Run Keyword If  ${should_we_click_btn_add_decision}  Wait Visibulity And Click Element  css=button[tid="btn.adddecision"]
-  Wait For Ajax
+  Sleep  1s
   Input text  xpath=(//input[@tid="decision.title"])[last()]  ${decision.title}
   Input text  xpath=(//input[@tid="decision.title_ru"])[last()]  ${decision.title_ru}
   Input text  xpath=(//input[@tid="decision.title_en"])[last()]  ${decision.title_en}
@@ -112,7 +125,7 @@ ${tender_data_assetHolder.name}  xpath=//div[@tid='assetHolder.name']
 Додати об'єкт продажу
   [Arguments]  ${item}  ${should_we_click_btn_add_item}=${False}
   Run Keyword If  ${should_we_click_btn_add_item}  Wait Visibulity And Click Element  css=button[tid="btn.additem"]
-  Wait Until Element Is Enabled  xpath=(//textarea[@tid="item.description"])[last()]  ${COMMONWAIT}
+  Sleep  1s
   Input text  xpath=(//textarea[@tid="item.description"])[last()]  ${item.description}
   #classification
   Input text  xpath=(//div[@tid='classification']//input)[last()]  ${item.classification.id}
@@ -130,12 +143,6 @@ ${tender_data_assetHolder.name}  xpath=//div[@tid='assetHolder.name']
   Input text  xpath=(//input[@tid='item.address.region'])[last()]  ${item.address.region}
   Input text  xpath=(//input[@tid='item.address.streetAddress'])[last()]  ${item.address.streetAddress}
   Input text  xpath=(//input[@tid='item.address.locality'])[last()]  ${item.address.locality}
-
-  Click Button  css=button[tid="btn.createasset"]
-  Wait For Ajax
-  Wait Until Element Is Not Visible  css=div.progress.progress-bar  ${COMMONWAIT}
-  Wait Until Element Is Visible  css=div[tid='data.title']  ${COMMONWAIT}
-  Wait For Ajax
 
 
 Оновити сторінку з об'єктом МП
@@ -191,7 +198,7 @@ ${tender_data_assetHolder.name}  xpath=//div[@tid='assetHolder.name']
 
 Login
   [Arguments]  ${username}
-  Sleep  10s
+  Sleep  15s
   Wait Enable And Click Element  css=a[ui-sref='modal.login']
   Login with email  ${username}
   ${notification_visibility}=  Run Keyword And Return Status  Wait Until Element Is Visible  css=button[ng-click='later()']
@@ -262,4 +269,18 @@ Try Search Auction
   Wait Until Element Is Not Visible  css=div.progress.progress-bar  ${COMMONWAIT}
   Wait Until Element Is Not Visible  css=div[role='dialog']  ${COMMONWAIT}
   Wait Until Element Is Visible  css=div[tid='${tender_id}']  ${COMMONWAIT}
+  [Return]  True
+
+
+Wait For Element With Reload
+  [Arguments]  ${locator}  ${time_to_wait}=4
+  Wait Until Keyword Succeeds  ${time_to_wait}min  15s  Try Search Element  ${locator}
+
+
+Try Search Element
+  [Arguments]  ${locator}
+  Reload Page
+  Wait For Ajax
+  Wait Until Element Is Visible  ${locator}  7
+  Wait Until Element Is Enabled  ${locator}  5
   [Return]  True
