@@ -11,6 +11,8 @@ ${COMMONWAIT}  8
 ${tender_data_assetID}  xpath=//div[@tid='assetID']
 ${tender_data_title}  xpath=//div[@tid='data.title']
 ${tender_data_description}  xpath=//div[@tid='description']
+${tender_data_date}  xpath=//span[@tid='date']
+${tender_data_rectificationPeriod.endDate}  xpath=//span[@tid='rectificationPeriod.endDate']
 
 ${tender_data_decisions[0].title}  xpath=//div[@tid='decision.title']
 ${tender_data_decisions[0].decisionDate}  xpath=//div[@tid='decision.date']
@@ -196,6 +198,7 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   [Arguments]  ${user_name}  ${tender_id}  ${field_name}
   Run Keyword And Return If  '${field_name}' == 'status'  Отримати status об'єкту МП  ${field_name}
   Run Keyword And Return If  '${field_name}' == 'decisions[0].decisionDate'  Отримати дату  ${field_name}
+  Run Keyword And Return If  '${field_name}' == 'documents[0].documentType'  Отримати тип документа  ${field_name}
 
   Wait Until Element Is Visible  ${tender_data_${field_name}}
   ${result_full}=  Get Text  ${tender_data_${field_name}}
@@ -232,12 +235,69 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   [Return]  ${result}
 
 
+Отримати status лоту
+  [Arguments]  ${element}
+  Reload Page
+  Sleep  5s
+  #${element_text}=  Get Text  xpath=//span[@tid='data.statusName']/span[1]  # !!! ПОДОБРАТЬ ЛОКАТОР !!!
+  ${text}=  Strip String  ${element_text}
+  ${text}=  Replace String  ${text}  ${\n}  ${EMPTY}
+  ${result}=  Set Variable If
+  ...  '${text}' == 'Чернетка'  draft
+  ...  '${text}' == 'Публікація інформаційного повідомлення'  composing
+  ...  '${text}' == 'Перевірка доступності об’єкту'  verification
+  ...  '${text}' == 'Опубліковано'  pending
+  ...  '${text}' == 'Об’єкт виставлено на продаж'  active.salable
+  ...  '${text}' == 'Аукціон'  active.auction
+  ...  '${text}' == 'Аукціон завершено. Кваліфікація'  active.contracting
+  ...  '${text}' == 'Аукціон завершено'  pending.sold
+  ...  '${text}' == 'Аукціон завершено. Об’єкт не продано'  pending.dissolution
+  ...  '${text}' == 'Об’єкт продано'  sold
+  ...  '${text}' == 'Об’єкт не продано'  dissolved
+  ...  '${text}' == 'Об’єкт виключено'  deleted
+  ...  ${element}
+  [Return]  ${result}
+
+
+Отримати тип документа
+  [Arguments]  ${element}
+  Reload Page
+  Sleep  5s
+  #${element_text}=  Get Text  xpath=//span[@tid='data.statusName']/span[1]  # !!! ПОДОБРАТЬ ЛОКАТОР !!!
+  ${text}=  Strip String  ${element_text}
+  ${text}=  Replace String  ${text}  ${\n}  ${EMPTY}
+  ${result}=  Set Variable If
+  ...  '${text}' == 'Рішення про затвердження переліку об’єктів, що підлягають приватизації'  notice
+  ...  '${text}' == 'Інформація про об’єкт малої приватизації'  technicalSpecifications
+  ...  '${text}' == 'Ілюстрації'  illustration
+  ...  '${text}' == 'Презентація'  x_presentation
+  ...  '${text}' == 'Додаткова інформація'  informationDetails
+  ...  '${text}' == 'Виключення з переліку'  cancellationDetails
+  ...  ${element}
+  [Return]  ${result}
+
+
 Отримати дату
   [Arguments]  ${field_name}
   Switch Browser  ${ALIAS_NAME}
   ${result_full}=  Get Text  ${tender_data_${field_name}}
   ${result_full}=  Convert Date  ${result_full}  date_format=%d-%m-%Y
   [Return]  ${result_full}
+
+
+Отримати дату та час
+  [Arguments]  ${field_name}
+  Switch Browser  ${ALIAS_NAME}
+  ${result_full}=  Отримати текст елемента  ${field_name}
+  ${result_full}=  Split String  ${result_full}
+  ${day_length}=  Get Length  ${result_full[0]}
+  ${day}=  Set Variable If  '${day_length}' == '1'  0${result_full[0]}  ${result_full[0]}
+  ${month}=  Replace String  ${result_full[1]}  ,  ${EMPTY}
+  ${month}=  get month number  ${month}
+  ${year}=  get_current_year
+  ${result_full}=  Set Variable  ${day}-${month}-${year} ${result_full[2]}
+  ${result}=  get_time_with_offset  ${result_full}
+  [Return]  ${result}
 
 
 Login
