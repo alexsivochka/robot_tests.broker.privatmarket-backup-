@@ -32,7 +32,7 @@ ${tender_data.assets.classification.scheme}  span[@tid="item.classification.sche
 ${tender_data.assets.classification.id}  span[@tid="item.classification.id"]
 ${tender_data.assets.unit.name}  span[@tid="item.unit.name"]
 ${tender_data.assets.quantity}  span[@tid="item.quantity"]
-${tender_data.assets.registrationDetails.status}  span[@tid="item.classification.scheme"]
+${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDetails.status"]
 
 
 *** Keywords ***
@@ -185,6 +185,7 @@ ${tender_data.assets.registrationDetails.status}  span[@tid="item.classification
   Wait For Element With Reload  ${element_for_work}
 
   Run Keyword And Return If  '${field_name}' == 'quantity'  Отримати число  ${element_for_work}
+  Run Keyword And Return If  '${field_name}' == 'registrationDetails.status'  Отримати registrationDetails.status  ${element_for_work}
 
   Wait Until Element Is Visible  ${element_for_work}  timeout=${COMMONWAIT}
   ${result}=  Отримати текст елемента  ${element_for_work}
@@ -216,6 +217,17 @@ ${tender_data.assets.registrationDetails.status}  span[@tid="item.classification
   ...  '${text}' == 'Інформаційне повідомлення опубліковано'  active
   ...  '${text}' == 'Аукціон завершено'  complete
   ...  '${text}' == 'Виключено з переліку'  deleted
+  ...  ${element}
+  [Return]  ${result}
+
+
+Отримати registrationDetails.status
+  [Arguments]  ${element}
+  ${text}=  Отримати текст елемента  ${element}
+  ${result}=  Set Variable If
+  ...  '${text}' == 'невідомо (не застосовується)'  unknown
+  ...  '${text}' == 'об’єкт реєструється'  registering
+  ...  '${text}' == 'об’єкт зареєстровано'  complete
   ...  ${element}
   [Return]  ${result}
 
@@ -322,7 +334,6 @@ Try Search Element
   ${selector}=  Set Variable If
   ...  'css=' in '${temp_name}' or 'xpath=' in '${temp_name}'  ${element_name}
   ...  ${tender_data.${element_name}}
-
   Wait Until Element Is Visible  ${selector}
   ${result_full}=  Get Text  ${selector}
   ${result}=  Strip String  ${result_full}
