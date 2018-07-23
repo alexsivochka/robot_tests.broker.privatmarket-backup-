@@ -264,7 +264,7 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   Reload Page
   Sleep  5s
   #${element_text}=  Get Text  xpath=//span[@tid='data.statusName']/span[1]  # !!! ПОДОБРАТЬ ЛОКАТОР !!!
-  ${text}=  Strip String  ${element_text}
+  ${text}=  Strip String  ${element}
   ${text}=  Replace String  ${text}  ${\n}  ${EMPTY}
   ${result}=  Set Variable If
   ...  '${text}' == 'Рішення про затвердження переліку об’єктів, що підлягають приватизації'  notice
