@@ -2,6 +2,7 @@
 
 from datetime import datetime
 from pytz import timezone
+import urllib
 
 
 def modify_test_data(tender_data):
@@ -32,3 +33,7 @@ def get_time_with_offset(date):
     time_zone = timezone('Europe/Kiev')
     localized_date = time_zone.localize(date_obj)
     return localized_date.strftime('%Y-%m-%d %H:%M:%S.%f%z')
+
+
+def download_file(url, file_name, output_dir):
+    urllib.urlretrieve(url, ('{}/{}'.format(output_dir, file_name)))
