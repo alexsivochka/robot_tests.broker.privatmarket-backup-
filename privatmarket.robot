@@ -6,7 +6,7 @@ Library  Collections
 Library  BuiltIn
 
 *** Variables ***
-${COMMONWAIT}  8
+${COMMONWAIT}  12
 
 ${tender_data_assetID}  xpath=//div[@tid='assetID']
 ${tender_data_title}  xpath=//div[@tid='data.title']
@@ -65,7 +65,8 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
 Підготувати дані для оголошення тендера
   [Arguments]  ${username}  ${tender_data}  ${role_name}
   Run Keyword If  '${role_name}' != 'tender_owner'  Return From Keyword  ${tender_data}
-  ${tender_data.data}=  modify_test_data  ${tender_data.data}
+  ${tender_data.data}=  privatmarket_service.modify_test_data  ${tender_data.data}
+  ${adapted.data}=  privatmarket_service.modify_test_data  ${tender_data.data}
   [Return]  ${tender_data}
 
 
@@ -298,6 +299,34 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   ${result_full}=  Set Variable  ${day}-${month}-${year} ${result_full[2]}
   ${result}=  get_time_with_offset  ${result_full}
   [Return]  ${result}
+
+
+Завантажити ілюстрацію в об'єкт МП
+  [Arguments]  ${user_name}  ${tender_id}  ${image_path}
+  Wait Enable And Click Element  css=button[tid="btn.modifyLot"]
+  Wait Until Element Is Visible  css=button[tid="btn.createasset"]
+  Execute Javascript  document.querySelector("input[id='input-doc-asset']").className = ''
+  Sleep  2s
+  Choose File  css=input[id='input-doc-asset']  ${image_path}
+  Sleep  10s
+  Wait Until Element Is Visible  css=select[tid="doc.type"]
+  Select From List  css=select[tid="doc.type"]  string:illustration
+  Sleep  2s
+  Wait Enable And Click Element  css=button[tid="btn.createasset"]
+
+
+Завантажити документ в об'єкт МП з типом
+  [Arguments]  ${user_name}  ${tender_id}  ${file_path}  ${doc_type}
+  Wait Enable And Click Element  css=button[tid="btn.modifyLot"]
+  Wait Until Element Is Visible  css=button[tid="btn.createasset"]
+  Execute Javascript  document.querySelector("input[id='input-doc-asset']").className = ''
+  Sleep  2s
+  Choose File  css=input[id='input-doc-asset']  ${file_path}
+  Sleep  10s
+  Wait Until Element Is Visible  xpath=(//select[@tid="doc.type"])[last()]
+  Select From List  xpath=(//select[@tid="doc.type"])[last()]  string:${doc_type}
+  Sleep  2s
+  Wait Enable And Click Element  css=button[tid="btn.createasset"]
 
 
 Login
