@@ -4,14 +4,14 @@ from datetime import datetime
 from pytz import timezone
 
 
-def modify_test_data(initial_data):
-    initial_data['assetCustodian']['identifier']['legalName'] = u'Тестовый Тестовый'
-    initial_data['assetCustodian']['identifier']['id'] = u'32855961'
-    if 'contactPoint' in initial_data['assetCustodian']:
-        initial_data['assetCustodian']['contactPoint']['telephone'] = u'+380123456789'
-        initial_data['assetCustodian']['contactPoint']['email'] = u'tadud@p33.org'
-        initial_data['assetCustodian']['contactPoint']['name'] = u'Тестовый Тестовый'
-    return initial_data
+def modify_test_data(tender_data):
+    tender_data['data']['assetCustodian']['identifier']['legalName'] = u'Тестовый Тестовый'
+    tender_data['data']['assetCustodian']['identifier']['id'] = u'32855961'
+    if 'contactPoint' in tender_data['data']['assetCustodian']:
+        tender_data['data']['assetCustodian']['contactPoint']['telephone'] = u'+380123456789'
+        tender_data['data']['assetCustodian']['contactPoint']['email'] = u'tadud@p33.org'
+        tender_data['data']['assetCustodian']['contactPoint']['name'] = u'Тестовый Тестовый'
+    return tender_data
 
 
 def get_current_year():
