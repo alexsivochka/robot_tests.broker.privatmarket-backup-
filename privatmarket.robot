@@ -11,8 +11,9 @@ ${COMMONWAIT}  12
 ${tender_data_assetID}  xpath=//div[@tid='assetID']
 ${tender_data_title}  xpath=//div[@tid='data.title']
 ${tender_data_description}  xpath=//div[@tid='description']
-${tender_data_date}  xpath=//span[@tid='date']
-${tender_data_rectificationPeriod.endDate}  xpath=//span[@tid='rectificationPeriod.endDate']
+${tender_data_date}  xpath=//div[@tid='creationDate']
+${tender_data_rectificationPeriod.endDate}  xpath=(//div[contains(@class, 'timeleft')])[1]
+${tender_data_documents[0].documentType}  xpath=//span[@tid='data.informationDetailstitle']/ancestor::div[1]  #//span[@tid='data.informationDetailstitle']/../..
 
 ${tender_data_decisions[0].title}  xpath=//div[@tid='decision.title']
 ${tender_data_decisions[0].decisionDate}  xpath=//div[@tid='decision.date']
@@ -172,6 +173,11 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   Sleep  3s
 
 
+Оновити сторінку з лотом
+  [Arguments]  ${user_name}  ${tender_id}
+  privatmarket.Оновити сторінку з об'єктом МП  ${user_name}  ${tender_id}
+
+
 Пошук об’єкта МП по ідентифікатору
   [Arguments]  ${user_name}  ${tender_id}
   Wait For Auction  ${tender_id}
@@ -198,12 +204,54 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   [Arguments]  ${user_name}  ${tender_id}  ${field_name}
   Run Keyword And Return If  '${field_name}' == 'status'  Отримати status об'єкту МП  ${field_name}
   Run Keyword And Return If  '${field_name}' == 'decisions[0].decisionDate'  Отримати дату  ${field_name}
-  Run Keyword And Return If  '${field_name}' == 'documents[0].documentType'  Отримати тип документа  ${field_name}
+  Run Keyword And Return If  '${field_name}' == 'date'  Отримати creationDate   ${field_name}
+  Run Keyword And Return If  '${field_name}' == 'rectificationPeriod.endDate'  Отримати rectificationPeriod.endDate  ${field_name}
+  Run Keyword And Return If  '${field_name}' == 'documents[0].documentType'  Отримати documents[0].documentType  ${field_name}
 
   Wait Until Element Is Visible  ${tender_data_${field_name}}
   ${result_full}=  Get Text  ${tender_data_${field_name}}
   ${result}=  Strip String  ${result_full}
   [Return]  ${result}
+
+
+Внести зміни в об'єкт МП
+  [Arguments]  ${user_name}  ${tender_id}  ${field_name}  ${value}
+  Reload Page
+  Sleep  5s
+  Wait Enable And Click Element  xpath=//button[@tid='btn.modifyLot']
+  Run Keyword If
+    ...  '${field_name}' == 'title'  Внести зміни в поле  css=input[tid='asset.title']  ${value}
+    ...  ELSE IF  '${field_name}' == 'description'  Внести зміни в поле  css=textarea[tid="asset.description"]  ${value}
+    ...  ELSE IF  '${field_name}'== 'decisions[0].title'  Внести зміни в поле  xpath=(//input[@tid="decision.title"])  ${value}
+
+
+Внести зміни в актив об'єкта МП
+  [Arguments]  ${user_name}  ${item_id}  ${tender_id}  ${field_name}  ${value}
+  Reload Page
+  Sleep  5s
+  Wait Enable And Click Element  xpath=//button[@tid='btn.modifyLot']
+  ${quantity}=  Run Keyword If  '${field_name}' == 'quantity'  Convert To String  ${value}
+  Run Keyword If
+    ...  '${field_name}' == 'quantity'  Внести зміни в поле  xpath=(//input[@tid='item.quantity'])  ${value}
+    ...  ELSE IF  '${field_name}' == 'description'  Внести зміни в поле  css=textarea[tid="asset.description"]  ${value}
+
+
+Внести зміни в поле
+  [Arguments]  ${elementLocator}  ${input}
+  Wait Until Element Is Visible  ${elementLocator}  ${COMMONWAIT}
+  Clear Element Text  ${elementLocator}
+  Input Text  ${elementLocator}  ${input}
+  Wait Enable And Click Element  css=button[tid='btn.createasset']
+
+
+Отримати документ
+  [Arguments]  ${username}  ${tender_uaid}  ${doc_id}
+  ${doc}=  Set Variable  xpath=//div[@id='fileitem' and contains(., '${doc_id}')]
+  ${file_name}=  Get Element Attribute  ${doc}@title
+  ${file_url}=  Get Element Attribute  ${doc}@url
+  download_file_from_url  ${file_url}  ${OUTPUT_DIR}${/}${file_name}
+  Sleep  5s
+  [Return]  ${file_name}
 
 
 Отримати status об'єкту МП
@@ -235,6 +283,24 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   [Return]  ${result}
 
 
+Отримати creationDate
+  [Arguments]  ${field_name}
+  ${result}=  Get Element Attribute  ${tender_data_${field_name}}@data-date
+  [Return]  ${result}
+
+
+Отримати rectificationPeriod.endDate
+  [Arguments]  ${field_name}
+  ${result}=  Get Element Attribute  ${tender_data_${field_name}}@data-enddate
+  [Return]  ${result}
+
+
+Отримати documents[0].documentType
+  [Arguments]  ${field_name}
+  ${result}=  Get Element Attribute  ${tender_data_${field_name}}@data-docType
+  [Return]  ${result}
+
+
 Отримати status лоту
   [Arguments]  ${element}
   Reload Page
@@ -259,22 +325,22 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   [Return]  ${result}
 
 
-Отримати тип документа
-  [Arguments]  ${element}
-  Reload Page
-  Sleep  5s
-  #${element_text}=  Get Text  xpath=//span[@tid='data.statusName']/span[1]  # !!! ПОДОБРАТЬ ЛОКАТОР !!!
-  ${text}=  Strip String  ${element}
-  ${text}=  Replace String  ${text}  ${\n}  ${EMPTY}
-  ${result}=  Set Variable If
-  ...  '${text}' == 'Рішення про затвердження переліку об’єктів, що підлягають приватизації'  notice
-  ...  '${text}' == 'Інформація про об’єкт малої приватизації'  technicalSpecifications
-  ...  '${text}' == 'Ілюстрації'  illustration
-  ...  '${text}' == 'Презентація'  x_presentation
-  ...  '${text}' == 'Додаткова інформація'  informationDetails
-  ...  '${text}' == 'Виключення з переліку'  cancellationDetails
-  ...  ${element}
-  [Return]  ${result}
+#Отримати тип документа
+#  [Arguments]  ${element}
+#  Reload Page
+#  Sleep  5s
+#  #${element_text}=  Get Text  xpath=//span[@tid='data.statusName']/span[1]  # !!! ПОДОБРАТЬ ЛОКАТОР !!!
+#  ${text}=  Strip String  ${element_text}
+#  ${text}=  Replace String  ${text}  ${\n}  ${EMPTY}
+#  ${result}=  Set Variable If
+#  ...  '${text}' == 'Рішення про затвердження переліку об’єктів, що підлягають приватизації'  notice
+#  ...  '${text}' == 'Інформація про об’єкт малої приватизації'  technicalSpecifications
+#  ...  '${text}' == 'Ілюстрації'  illustration
+#  ...  '${text}' == 'Презентація'  x_presentation
+#  ...  '${text}' == 'Додаткова інформація'  informationDetails
+#  ...  '${text}' == 'Виключення з переліку'  cancellationDetails
+#  ...  ${element}
+#  [Return]  ${result}
 
 
 Отримати дату
@@ -283,21 +349,6 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   ${result_full}=  Get Text  ${tender_data_${field_name}}
   ${result_full}=  Convert Date  ${result_full}  date_format=%d-%m-%Y
   [Return]  ${result_full}
-
-
-Отримати дату та час
-  [Arguments]  ${field_name}
-  Switch Browser  ${ALIAS_NAME}
-  ${result_full}=  Отримати текст елемента  ${field_name}
-  ${result_full}=  Split String  ${result_full}
-  ${day_length}=  Get Length  ${result_full[0]}
-  ${day}=  Set Variable If  '${day_length}' == '1'  0${result_full[0]}  ${result_full[0]}
-  ${month}=  Replace String  ${result_full[1]}  ,  ${EMPTY}
-  ${month}=  get month number  ${month}
-  ${year}=  get_current_year
-  ${result_full}=  Set Variable  ${day}-${month}-${year} ${result_full[2]}
-  ${result}=  get_time_with_offset  ${result_full}
-  [Return]  ${result}
 
 
 Завантажити ілюстрацію в об'єкт МП
@@ -379,6 +430,12 @@ Wait Enable And Click Element
   Wait Until Element Is Enabled  ${elementLocator}  ${COMMONWAIT}
   Click Element  ${elementLocator}
   Wait For Ajax
+
+
+Wait Visibility And Click Element
+    [Arguments]  ${elementLocator}
+    Wait Until Element Is Visible  ${elementLocator}  ${COMMONWAIT}
+    Click Element  ${elementLocator}
 
 
 Wait For Auction
