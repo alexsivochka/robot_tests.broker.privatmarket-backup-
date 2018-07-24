@@ -64,9 +64,7 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
 
 Підготувати дані для оголошення тендера
   [Arguments]  ${username}  ${tender_data}  ${role_name}
-  Run Keyword If  '${role_name}' != 'tender_owner'  Return From Keyword  ${tender_data}
   ${tender_data.data}=  privatmarket_service.modify_test_data  ${tender_data.data}
-  ${adapted.data}=  privatmarket_service.modify_test_data  ${tender_data.data}
   [Return]  ${tender_data}
 
 
