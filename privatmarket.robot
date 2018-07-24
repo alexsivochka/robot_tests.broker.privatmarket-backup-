@@ -248,8 +248,9 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   [Arguments]  ${username}  ${tender_uaid}  ${doc_id}
   ${doc}=  Set Variable  xpath=//div[@id='fileitem' and contains(., '${doc_id}')]
   ${file_name}=  Get Element Attribute  ${doc}@title
-  ${url}=  Get Element Attribute  ${doc}@url
-  download_file   ${url}  ${file_name}  ${OUTPUT_DIR}
+  ${file_url}=  Get Element Attribute  ${doc}@url
+  download_file_from_url  ${file_url}  ${OUTPUT_DIR}${/}${file_name}
+  Sleep  5s
   [Return]  ${file_name}
 
 
