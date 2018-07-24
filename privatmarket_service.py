@@ -5,7 +5,6 @@ from pytz import timezone
 
 
 def modify_test_data(initial_data):
-    #initial_data['procuringEntity']['name'] = u"ВОЛОДИМИР БІЛЯВЦЕВ"
     initial_data['assetCustodian']['identifier']['legalName'] = u'Тестовый Тестовый'
     initial_data['assetCustodian']['identifier']['id'] = u'32855961'
     if 'contactPoint' in initial_data['assetCustodian']:
