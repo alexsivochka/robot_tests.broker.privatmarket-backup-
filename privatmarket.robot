@@ -24,7 +24,7 @@ ${lot_data_decisions[1].title}  xpath=//div[@tid='decision.title']
 ${lot_data_decisions[1].decisionDate}  xpath=//div[@tid='decision.date']
 ${lot_data_decisions[1].decisionID}  xpath=//div[@tid='decision.id']
 
-${lot_data_assets}  xpath=//div[@tid='assets']
+${lot_data_assets}  xpath=//div[@tid='asset']
 
 ${lot_data_lotHolder.name}  xpath=//div[@tid='lotHolder.name']
 ${lot_data_lotHolder.identifier.scheme}  xpath=//div[@tid='lotHolder.identifier.scheme']
