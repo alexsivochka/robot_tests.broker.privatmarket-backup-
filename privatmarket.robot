@@ -242,7 +242,7 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   Sleep  5s
   Wait Enable And Click Element  css=button[tid='btn.removeAsset']
   Wait Enable And Click Element  css=button[tid='defaultOk']
-  Wait Until Page Contains    Видалено з реєстру  20
+  Wait Until Page Contains  Виключено з переліку  20
 
 
 Внести зміни в поле
