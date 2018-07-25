@@ -17,6 +17,7 @@ ${tender_data_rectificationPeriod.endDate}  xpath=(//div[contains(@class, 'timel
 ${tender_data_documents[0].documentType}  xpath=//span[@tid='data.informationDetailstitle']/ancestor::div[1]
 
 ${lot_data_lotID}  xpath=//div[@tid='assetID']
+${lot_data_date}  xpath=//div[@tid='date']
 ${lot_data_title}  xpath=//div[@tid='data.title']
 ${lot_data_description}  xpath=//div[@tid='description']
 
@@ -24,7 +25,7 @@ ${lot_data_decisions[1].title}  xpath=//div[@tid='decision.title']
 ${lot_data_decisions[1].decisionDate}  xpath=//div[@tid='decision.date']
 ${lot_data_decisions[1].decisionID}  xpath=//div[@tid='decision.id']
 
-${lot_data_assets}  xpath=//div[@tid='assets']
+${lot_data_assets}  xpath=//div[@tid='asset']
 
 ${lot_data_lotHolder.name}  xpath=//div[@tid='lotHolder.name']
 ${lot_data_lotHolder.identifier.scheme}  xpath=//div[@tid='lotHolder.identifier.scheme']
@@ -227,6 +228,15 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   [Return]  ${result}
 
 
+Отримати інформацію з рішення
+  [Arguments]  ${field_name}
+  ${index}=  Get Regexp Matches  ${field_name}  [(\d)]  1
+  ${element_to_work}=  Set variable  xpath=//decision.${index}.${field_name}
+  ${result}=  Get Text  ${element_to_work}
+  Run Keyword And Return If  'decisionDate' in '${element_to_work}'  Convert Date  ${result}  date_format=%d-%m-%Y
+  [Return]  ${result}
+
+
 Отримати інформацію з активу лоту
   [Arguments]  ${username}  ${tender_id}  ${object_id}  ${field_name}
   privatmarket.Отримати інформацію з активу об'єкта МП  ${username}  ${tender_id}  ${object_id}  ${field_name}
@@ -240,8 +250,6 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   Run Keyword And Return If  '${field_name}' == 'date'  Отримати creationDate   ${field_name}
   Run Keyword And Return If  '${field_name}' == 'rectificationPeriod.endDate'  Отримати rectificationPeriod.endDate  ${field_name}
   Run Keyword And Return If  '${field_name}' == 'documents[0].documentType'  Отримати documents[0].documentType  ${field_name}
-
-
 
   Wait Until Element Is Visible  ${tender_data_${field_name}}
   ${result_full}=  Get Text  ${tender_data_${field_name}}
@@ -261,7 +269,8 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   Run Keyword And Return If  'registrationFee.amount' in '${field_name}'  Отримати розмір реєстраційного внеску аукціону  ${field_name}
   Run Keyword And Return If  'tenderingDuration' in '${field_name}'  Отримати період на подачу пропозицій  ${field_name}
   Run Keyword And Return If  'auctionPeriod.startDate' in '${field_name}'  Отримати дату початку аукціону  ${field_name}
-
+  Run Keyword And Return If  'decisions' in '${field_name}' Отримати інформацію з рішення  ${field_name}
+  Run Keyword And Return If  'date' in '${field_name}'  Отримати дату створення лоту  ${field_name}
 
   Wait Until Element Is Visible  ${lot_data_${field_name}}
   ${result_full}=  Get Text  ${lot_data_${field_name}}
@@ -485,6 +494,14 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   [Arguments]  ${field_name}
   Switch Browser  ${ALIAS_NAME}
   ${result_full}=  Get Text  ${tender_data_${field_name}}
+  ${result_full}=  Convert Date  ${result_full}  date_format=%d-%m-%Y
+  [Return]  ${result_full}
+
+
+Отримати дату створення лоту
+  [Arguments]  ${field_name}
+  Switch Browser  ${ALIAS_NAME}
+  ${result_full}=  Get Text  ${lot_data_${field_name}}
   ${result_full}=  Convert Date  ${result_full}  date_format=%d-%m-%Y
   [Return]  ${result_full}
 
