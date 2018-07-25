@@ -17,12 +17,16 @@ ${tender_data_rectificationPeriod.endDate}  xpath=(//div[contains(@class, 'timel
 ${tender_data_documents[0].documentType}  xpath=//span[@tid='data.informationDetailstitle']/ancestor::div[1]
 
 ${lot_data_lotID}  xpath=//div[@tid='lotID']
+${lot_data_date}  xpath=//div[@tid='date']
 ${lot_data_title}  xpath=//div[@tid='data.title']
+${lot_data_rectificationPeriod.endDate}  xpath=//div[@tid='data.rectificationPeriod.endDate']
 ${lot_data_description}  xpath=//div[@tid='description']
 
-${lot_data_decisions[1].title}  xpath=//div[@tid='decision.title']
-${lot_data_decisions[1].decisionDate}  xpath=//div[@tid='decision.date']
-${lot_data_decisions[1].decisionID}  xpath=//div[@tid='decision.id']
+${lot_data_decisions[0].decisionID}  xpath=//div[@tid='decision.0.decisionID']
+${lot_data_decisions[0].decisionDate}  xpath=//div[@tid='decision.0.decisionDate']
+${lot_data_decisions[1].title}  xpath=//div[@tid='decision.1.title']
+${lot_data_decisions[1].decisionDate}  xpath=//div[@tid='decision.1.decisionDate']
+${lot_data_decisions[1].decisionID}  xpath=//div[@tid='decision.1.decisionID']
 
 ${lot_data_assets}  xpath=//div[@tid='asset']
 
@@ -226,6 +230,14 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   [Return]  ${result}
 
 
+Отримати інформацію з рішення
+  [Arguments]  ${field_name}
+  Run Keyword And Return If  '${field_name}' == 'decisions[0].decisionID'  Get Text  ${lot_data_decisions[0].decisionID}
+  Run Keyword And Return If  '${field_name}' == 'decisions[1].title'  Get Text  ${lot_data_decisions[1].title}
+  Run Keyword And Return If  '${field_name}' == 'decisions[1].decisionID'  Get Text  ${lot_data_decisions[1].decisionID}
+  Run Keyword And Return If  'decisionDate' in '${field_name}'  Отримати дату з рішення  ${field_name}
+
+
 Отримати інформацію з активу лоту
   [Arguments]  ${username}  ${tender_id}  ${object_id}  ${field_name}
   privatmarket.Отримати інформацію з активу об'єкта МП  ${username}  ${tender_id}  ${object_id}  ${field_name}
@@ -239,8 +251,6 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   Run Keyword And Return If  '${field_name}' == 'date'  Отримати creationDate   ${field_name}
   Run Keyword And Return If  '${field_name}' == 'rectificationPeriod.endDate'  Отримати rectificationPeriod.endDate  ${field_name}
   Run Keyword And Return If  '${field_name}' == 'documents[0].documentType'  Отримати documents[0].documentType  ${field_name}
-
-
 
   Wait Until Element Is Visible  ${tender_data_${field_name}}
   ${result_full}=  Get Text  ${tender_data_${field_name}}
@@ -263,7 +273,9 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   Run Keyword And Return If  'registrationFee.amount' in '${field_name}'  Отримати розмір реєстраційного внеску аукціону  ${field_name}
   Run Keyword And Return If  'tenderingDuration' in '${field_name}'  Отримати період на подачу пропозицій  ${field_name}
   Run Keyword And Return If  'auctionPeriod.startDate' in '${field_name}'  Отримати дату початку аукціону  ${field_name}
-
+  Run Keyword And Return If  'decisions' in '${field_name}'  Отримати інформацію з рішення  ${field_name}
+  Run Keyword And Return If  'date' in '${field_name}'  Отримати lot_dates  ${field_name}
+  Run Keyword And Return If  '${field_name}' == 'rectificationPeriod.endDate'  Отримати lot_dates  ${field_name}
 
   Wait Until Element Is Visible  ${lot_data_${field_name}}
   ${result_full}=  Get Text  ${lot_data_${field_name}}
@@ -434,6 +446,12 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   [Return]  ${result}
 
 
+Отримати lot_dates
+  [Arguments]  ${field_name}
+  ${result}=  Get Element Attribute  ${lot_data_${field_name}}@tidvalue
+  [Return]  ${result}
+
+
 Отримати documents[0].documentType
   [Arguments]  ${field_name}
   ${result}=  Get Element Attribute  ${tender_data_${field_name}}@data-docType
@@ -488,6 +506,18 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   ${result_full}=  Get Text  ${tender_data_${field_name}}
   ${result_full}=  Convert Date  ${result_full}  date_format=%d-%m-%Y
   [Return]  ${result_full}
+
+
+Отримати дату з рішення
+  [Arguments]  ${field_name}
+  ${result_full}=  Get Text  ${lot_data_${field_name}}
+  ${result_full}=  Split String  ${result_full}  -
+  ${day_length}=  Get Length  ${result_full[0]}
+  ${day}=  Set Variable If  '${day_length}' == '1'  0${result_full[0]}  ${result_full[0]}
+  ${month}=  Set Variable  ${result_full[1]}
+  ${year}=  Set Variable  ${result_full[2]}
+  ${result}=  Set Variable  ${year}-${month}-${day}
+  [Return]  ${result}
 
 
 Завантажити ілюстрацію в об'єкт МП
