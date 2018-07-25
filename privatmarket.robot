@@ -248,11 +248,89 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
 Отримати інформацію із лоту
   [Arguments]  ${user_name}  ${tender_id}  ${field_name}
   Run Keyword And Return If  '${field_name}' == 'status'  Отримати status лоту  ${field_name}
+  Run Keyword And Return If  'procurementMethodType' in '${field_name}'  Отримати тип аукціону  ${field_name}
+  Run Keyword And Return If  'status' in '${field_name}' and 'auction' in '${field_name}'  Отримати статус аукціону  ${field_name}
+  Run Keyword And Return If  'tenderAttempts' in '${field_name}'  Отримати кількість виставлень лоту  ${field_name}
+  Run Keyword And Return If  'value.amount' in '${field_name}'  Отримати початкову вартість аукціону  ${field_name}
+  Run Keyword And Return If  'minimalStep.amount' in '${field_name}'  Отримати крок аукціону  ${field_name}
+  Run Keyword And Return If  'guarantee.amount' in '${field_name}'  Отримати розмір гарантійного внеску аукціону  ${field_name}
+  Run Keyword And Return If  'registrationFee.amount' in '${field_name}'  Отримати розмір реєстраційного внеску аукціону  ${field_name}
+  Run Keyword And Return If  'tenderingDuration' in '${field_name}'  Отримати період на подачу пропозицій  ${field_name}
+  Run Keyword And Return If  'auctionPeriod.startDate' in '${field_name}'  Отримати дату початку аукціону  ${field_name}
 
 
   Wait Until Element Is Visible  ${lot_data_${field_name}}
   ${result_full}=  Get Text  ${lot_data_${field_name}}
   ${result}=  Strip String  ${result_full}
+  [Return]  ${result}
+
+
+Отримати тип аукціону
+  [Arguments]  ${field_name}
+  ${index}=  Get Regexp Matches  ${field_name}  [(\d)]  1
+  ${result}=  Get Element Attribute  xpath=//div[@tid="auction.${index}.procurementMethod"]@tidvalue
+  [Return]  ${result}
+
+
+Отримати статус аукціону
+  [Arguments]  ${field_name}
+  ${index}=  Get Regexp Matches  ${field_name}  [(\d)]  1
+  ${result}=  Get Element Attribute  xpath=//div[@tid="auction.${index}.status"]@tidvalue
+  [Return]  ${result}
+
+
+Отримати кількість виставлень лоту
+  [Arguments]  ${field_name}
+  ${index}=  Get Regexp Matches  ${field_name}  [(\d)]  1
+  ${result}=  Отримати текст елемента  xpath=//div[@tid="auction.${index}.tenderAttempts"]
+  [Return]  ${result}
+
+
+Отримати початкову вартість аукціону
+  [Arguments]  ${field_name}
+  ${index}=  Get Regexp Matches  ${field_name}  [(\d)]  1
+  ${result}=  Отримати текст елемента  xpath=//div[@tid="auction.${index}.value.amount"]
+  ${result}=  Remove String  ${result}  ${SPACE}
+  [Return]  ${result}
+
+
+Отримати крок аукціону
+  [Arguments]  ${field_name}
+  ${index}=  Get Regexp Matches  ${field_name}  [(\d)]  1
+  ${result}=  Отримати текст елемента  xpath=//div[@tid="auction.${index}.minimalStep.amount"]
+  ${result}=  Remove String  ${result}  ${SPACE}
+  [Return]  ${result}
+
+
+Отримати розмір гарантійного внеску аукціону
+  [Arguments]  ${field_name}
+  ${index}=  Get Regexp Matches  ${field_name}  [(\d)]  1
+  ${result}=  Отримати текст елемента  xpath=//div[@tid="auction.${index}.guarantee.amount"]
+  ${result}=  Remove String  ${result}  ${SPACE}
+  [Return]  ${result}
+
+
+Отримати розмір реєстраційного внеску аукціону
+  [Arguments]  ${field_name}
+  ${index}=  Get Regexp Matches  ${field_name}  [(\d)]  1
+  ${result}=  Отримати текст елемента  xpath=//div[@tid="auction.${index}.registrationFee.amount"]
+  ${result}=  Remove String  ${result}  ${SPACE}
+  [Return]  ${result}
+
+
+Отримати період на подачу пропозицій
+  [Arguments]  ${field_name}
+  ${index}=  Get Regexp Matches  ${field_name}  [(\d)]  1
+  ${result}=  Отримати текст елемента  xpath=//div[@tid="auction.${index}.tenderingDuration"]
+  ${result}=  Remove String  ${result}  ${SPACE}
+  [Return]  ${result}
+
+
+Отримати дату початку аукціону
+  [Arguments]  ${field_name}
+  ${index}=  Get Regexp Matches  ${field_name}  [(\d)]  1
+  ${result}=  Отримати текст елемента  xpath=//div[@tid="auction.${index}.auctionPeriod.startDate"]
+  ${result}=  Remove String  ${result}  ${SPACE}
   [Return]  ${result}
 
 
