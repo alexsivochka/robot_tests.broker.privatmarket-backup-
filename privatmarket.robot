@@ -230,7 +230,7 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   Reload Page
   Sleep  5s
   Wait Enable And Click Element  xpath=//button[@tid='btn.modifyLot']
-  ${quantity}=  Run Keyword If  '${field_name}' == 'quantity'  Convert To String  ${value}
+  ${quantity}=  Run Keyword If  '${field_name}' == 'quantity'  Convert To String  ${quantity}
   Run Keyword If
     ...  '${field_name}' == 'quantity'  Внести зміни в поле  xpath=(//input[@tid='item.quantity'])  ${value}
     ...  ELSE IF  '${field_name}' == 'description'  Внести зміни в поле  css=textarea[tid="asset.description"]  ${value}
