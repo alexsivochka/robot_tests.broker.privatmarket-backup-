@@ -13,7 +13,24 @@ ${tender_data_title}  xpath=//div[@tid='data.title']
 ${tender_data_description}  xpath=//div[@tid='description']
 ${tender_data_date}  xpath=//div[@tid='creationDate']
 ${tender_data_rectificationPeriod.endDate}  xpath=(//div[contains(@class, 'timeleft')])[1]
-${tender_data_documents[0].documentType}  xpath=//span[@tid='data.informationDetailstitle']/ancestor::div[1]  #//span[@tid='data.informationDetailstitle']/../..
+${tender_data_documents[0].documentType}  xpath=//span[@tid='data.informationDetailstitle']/ancestor::div[1]
+
+${lot_data_lotID}  xpath=//div[@tid='assetID']
+${lot_data_title}  xpath=//div[@tid='data.title']
+${lot_data_description}  xpath=//div[@tid='description']
+${tender_data_decisions[1].title}  xpath=//div[@tid='decision.title']
+${lot_data_assets}  xpath=//div[@tid='assets']
+
+${lot_data_lotHolder.name}  xpath=//div[@tid='lotHolder.name']
+${lot_data_lotHolder.identifier.scheme}  xpath=//div[@tid='lotHolder.identifier.scheme']
+${lot_data_lotHolder.identifier.id}  xpath=//div[@tid='lotHolder.identifier.id']
+
+${lot_data_lotCustodian.identifier.scheme}  xpath=//div[@tid='data.lotCustodian.identifier.scheme']
+${lot_data_lotCustodian.identifier.id}  xpath=//div[@tid='data.lotCustodian.identifier.id']
+${lot_data_lotCustodian.identifier.legalName}  xpath=//div[@tid='data.lotCustodian.identifier.legalName']
+${lot_data_lotCustodian.contactPoint.name}  xpath=//div[@tid='data.lotCustodian.contactPoint.name']
+${lot_data_lotCustodian.contactPoint.telephone}  xpath=//div[@tid='data.lotCustodian.contactPoint.telephone']
+${lot_data_lotCustodian.contactPoint.email}  xpath=//div[@tid='data.lotCustodian.contactPoint.email']
 
 ${tender_data_decisions[0].title}  xpath=//div[@tid='decision.title']
 ${tender_data_decisions[0].decisionDate}  xpath=//div[@tid='decision.date']
@@ -186,6 +203,11 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   Wait Until element Is Visible  css=div[tid='data.title']  ${COMMONWAIT}
 
 
+Пошук лоту по ідентифікатору
+  [Arguments]  ${user_name}  ${tender_id}
+  privatmarket.Пошук об’єкта МП по ідентифікатору  ${user_name}  ${tender_id}
+
+
 Отримати інформацію з активу об'єкта МП
   [Arguments]  ${username}  ${tender_id}  ${object_id}  ${field_name}
   ${element}=  Convert To String  assets.${field_name}
@@ -210,6 +232,17 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
 
   Wait Until Element Is Visible  ${tender_data_${field_name}}
   ${result_full}=  Get Text  ${tender_data_${field_name}}
+  ${result}=  Strip String  ${result_full}
+  [Return]  ${result}
+
+
+Отримати інформацію із лоту
+  [Arguments]  ${user_name}  ${tender_id}  ${field_name}
+  Run Keyword And Return If  '${field_name}' == 'status'  Отримати status лоту  ${field_name}
+
+
+  Wait Until Element Is Visible  ${lot_data_${field_name}}
+  ${result_full}=  Get Text  ${lot_data_${field_name}}
   ${result}=  Strip String  ${result_full}
   [Return]  ${result}
 
@@ -248,7 +281,7 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
 Внести зміни в поле
   [Arguments]  ${elementLocator}  ${input}
   Wait Until Element Is Visible  ${elementLocator}  ${COMMONWAIT}
-  #Clear Element Text  ${elementLocator}
+  Clear Element Text  ${elementLocator}
   Input Text  ${elementLocator}  ${input}
   Wait Enable And Click Element  css=button[tid='btn.createasset']
 
@@ -314,7 +347,7 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   [Arguments]  ${element}
   Reload Page
   Sleep  5s
-  #${element_text}=  Get Text  xpath=//span[@tid='data.statusName']/span[1]  # !!! ПОДОБРАТЬ ЛОКАТОР !!!
+  ${element_text}=  Get Text  xpath=//span[@tid='data.statusName']/span[1]
   ${text}=  Strip String  ${element_text}
   ${text}=  Replace String  ${text}  ${\n}  ${EMPTY}
   ${result}=  Set Variable If
