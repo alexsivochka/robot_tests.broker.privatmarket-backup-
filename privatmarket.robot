@@ -236,10 +236,19 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
     ...  ELSE IF  '${field_name}' == 'description'  Внести зміни в поле  css=textarea[tid="asset.description"]  ${value}
 
 
+Видалити об'єкт МП
+  [Arguments]  ${user_name}  ${tender_id}
+  Reload Page
+  Sleep  5s
+  Wait Enable And Click Element  css=button[tid='btn.removeAsset']
+  Wait Enable And Click Element  css=button[tid='defaultOk']
+  Wait Until Page Contains    Видалено з реєстру  20
+
+
 Внести зміни в поле
   [Arguments]  ${elementLocator}  ${input}
   Wait Until Element Is Visible  ${elementLocator}  ${COMMONWAIT}
-  Clear Element Text  ${elementLocator}
+  #Clear Element Text  ${elementLocator}
   Input Text  ${elementLocator}  ${input}
   Wait Enable And Click Element  css=button[tid='btn.createasset']
 
@@ -375,6 +384,20 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   Sleep  10s
   Wait Until Element Is Visible  xpath=(//select[@tid="doc.type"])[last()]
   Select From List  xpath=(//select[@tid="doc.type"])[last()]  string:${doc_type}
+  Sleep  2s
+  Wait Enable And Click Element  css=button[tid="btn.createasset"]
+
+
+Завантажити документ для видалення об'єкта МП
+  [Arguments]  ${user_name}  ${tender_id}  ${file_path}
+  Wait Enable And Click Element  css=button[tid="btn.modifyLot"]
+  Wait Until Element Is Visible  css=button[tid="btn.createasset"]
+  Execute Javascript  document.querySelector("input[id='input-doc-asset']").className = ''
+  Sleep  2s
+  Choose File  css=input[id='input-doc-asset']  ${file_path}
+  Sleep  10s
+  Wait Until Element Is Visible  xpath=(//select[@tid="doc.type"])[last()]
+  Select From List  xpath=(//select[@tid="doc.type"])[last()]  string:cancellationDetails
   Sleep  2s
   Wait Enable And Click Element  css=button[tid="btn.createasset"]
 
