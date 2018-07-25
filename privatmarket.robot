@@ -18,16 +18,20 @@ ${tender_data_documents[0].documentType}  xpath=//span[@tid='data.informationDet
 ${lot_data_lotID}  xpath=//div[@tid='assetID']
 ${lot_data_title}  xpath=//div[@tid='data.title']
 ${lot_data_description}  xpath=//div[@tid='description']
-${tender_data_decisions[1].title}  xpath=//div[@tid='decision.title']
+
+${lot_data_decisions[1].title}  xpath=//div[@tid='decision.title']
+${lot_data_decisions[1].decisionDate}  xpath=//div[@tid='decision.date']
+${lot_data_decisions[1].decisionID}  xpath=//div[@tid='decision.id']
+
 ${lot_data_assets}  xpath=//div[@tid='assets']
 
 ${lot_data_lotHolder.name}  xpath=//div[@tid='lotHolder.name']
 ${lot_data_lotHolder.identifier.scheme}  xpath=//div[@tid='lotHolder.identifier.scheme']
 ${lot_data_lotHolder.identifier.id}  xpath=//div[@tid='lotHolder.identifier.id']
 
-${lot_data_lotCustodian.identifier.scheme}  xpath=//div[@tid='data.lotCustodian.identifier.scheme']
-${lot_data_lotCustodian.identifier.id}  xpath=//div[@tid='data.lotCustodian.identifier.id']
-${lot_data_lotCustodian.identifier.legalName}  xpath=//div[@tid='data.lotCustodian.identifier.legalName']
+${lot_data_lotCustodian.identifier.scheme}  xpath=//div[@tid='data.assetCustodian.identifier.scheme']
+${lot_data_lotCustodian.identifier.id}  xpath=//div[@tid='data.assetCustodian.identifier.id']
+${lot_data_lotCustodian.identifier.legalName}  xpath=//div[@tid='data.assetCustodian.identifier.legalName']
 ${lot_data_lotCustodian.contactPoint.name}  xpath=//div[@tid='data.lotCustodian.contactPoint.name']
 ${lot_data_lotCustodian.contactPoint.telephone}  xpath=//div[@tid='data.lotCustodian.contactPoint.telephone']
 ${lot_data_lotCustodian.contactPoint.email}  xpath=//div[@tid='data.lotCustodian.contactPoint.email']
@@ -222,6 +226,11 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   [Return]  ${result}
 
 
+Отримати інформацію з активу лоту
+  [Arguments]  ${username}  ${tender_id}  ${object_id}  ${field_name}
+  privatmarket.Отримати інформацію з активу об'єкта МП  ${username}  ${tender_id}  ${object_id}  ${field_name}
+
+
 Отримати інформацію із об'єкта МП
   [Arguments]  ${user_name}  ${tender_id}  ${field_name}
   Run Keyword And Return If  '${field_name}' == 'status'  Отримати status об'єкту МП  ${field_name}
@@ -359,7 +368,6 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
 Внести зміни в поле
   [Arguments]  ${elementLocator}  ${input}
   Wait Until Element Is Visible  ${elementLocator}  ${COMMONWAIT}
-  Clear Element Text  ${elementLocator}
   Input Text  ${elementLocator}  ${input}
   Wait Enable And Click Element  css=button[tid='btn.createasset']
 
