@@ -12,6 +12,7 @@ ${tender_data_assetID}  xpath=//div[@tid='assetID']
 ${tender_data_title}  xpath=//div[@tid='data.title']
 ${tender_data_description}  xpath=//div[@tid='description']
 ${tender_data_date}  xpath=//div[@tid='creationDate']
+${tender_data_dateModified}  xpath=//div[@tid='modifyDate']
 ${tender_data_rectificationPeriod.endDate}  xpath=(//div[contains(@class, 'timeleft')])[1]
 ${tender_data_documents[0].documentType}  xpath=//span[@tid='data.informationDetailstitle']/ancestor::div[1]
 
@@ -235,9 +236,12 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   [Arguments]  ${user_name}  ${tender_id}  ${field_name}
   Run Keyword And Return If  '${field_name}' == 'status'  Отримати status об'єкту МП  ${field_name}
   Run Keyword And Return If  '${field_name}' == 'decisions[0].decisionDate'  Отримати дату  ${field_name}
+  Run Keyword And Return If  '${field_name}' == 'dateModified'  Отримати дату внесення змін  ${field_name}
   Run Keyword And Return If  '${field_name}' == 'date'  Отримати creationDate   ${field_name}
   Run Keyword And Return If  '${field_name}' == 'rectificationPeriod.endDate'  Отримати rectificationPeriod.endDate  ${field_name}
   Run Keyword And Return If  '${field_name}' == 'documents[0].documentType'  Отримати documents[0].documentType  ${field_name}
+
+
 
   Wait Until Element Is Visible  ${tender_data_${field_name}}
   ${result_full}=  Get Text  ${tender_data_${field_name}}
@@ -412,6 +416,12 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
 
 
 Отримати creationDate
+  [Arguments]  ${field_name}
+  ${result}=  Get Element Attribute  ${tender_data_${field_name}}@data-date
+  [Return]  ${result}
+
+
+Отримати дату внесення змін
   [Arguments]  ${field_name}
   ${result}=  Get Element Attribute  ${tender_data_${field_name}}@data-date
   [Return]  ${result}
