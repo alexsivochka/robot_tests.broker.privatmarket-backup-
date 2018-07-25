@@ -22,9 +22,11 @@ ${lot_data_title}  xpath=//div[@tid='data.title']
 ${lot_data_rectificationPeriod.endDate}  xpath=//div[@tid='data.rectificationPeriod.endDate']
 ${lot_data_description}  xpath=//div[@tid='description']
 
-${lot_data_decisions[1].title}  xpath=//div[@tid='decision.title']
-${lot_data_decisions[1].decisionDate}  xpath=//div[@tid='decision.date']
-${lot_data_decisions[1].decisionID}  xpath=//div[@tid='decision.id']
+${lot_data_decisions[0].decisionID}  xpath=//div[@tid='decision.0.decisionID']
+${lot_data_decisions[0].decisionDate}  xpath=//div[@tid='decision.0.decisionDate']
+${lot_data_decisions[1].title}  xpath=//div[@tid='decision.1.title']
+${lot_data_decisions[1].decisionDate}  xpath=//div[@tid='decision.1.decisionDate']
+${lot_data_decisions[1].decisionID}  xpath=//div[@tid='decision.1.decisionID']
 
 ${lot_data_assets}  xpath=//div[@tid='asset']
 
@@ -230,12 +232,15 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
 
 Отримати інформацію з рішення
   [Arguments]  ${field_name}
-  ${index}=  Get Regexp Matches  ${field_name}  [(\\d)]  0
-  Run Keyword And Return If
-  ${element_to_work}=  Set variable  xpath=//decision.${index}.${field_name}
-  ${result}=  Get Text  ${element_to_work}
-  Run Keyword And Return If  'decisionDate' in '${element_to_work}'  Convert Date  ${result}  date_format=%d-%m-%Y
-  [Return]  ${result}
+  Run Keyword And Return If  '${field_name}' == 'decisions[0].decisionID'  Get Text  ${lot_data_decisions[0].decisionID}
+  Run Keyword And Return If  '${field_name}' == 'decisions[1].title'  Get Text  ${lot_data_decisions[1].title}
+  Run Keyword And Return If  '${field_name}' == 'decisions[1].decisionID'  Get Text  ${lot_data_decisions[1].decisionID}
+  Run Keyword And Return If  'decisionDate' in '${field_name}'  Отримати дату з рішення  ${field_name}
+#  ${index}=  Get Regexp Matches  ${field_name}  [(\\d)]  0
+#  ${element_to_work}=  Set variable  xpath=//decision.${index}.${field_name}
+#  ${result}=  Get Text  ${element_to_work}
+#  Run Keyword And Return If  'decisionDate' in '${element_to_work}'  Convert Date  ${result}  date_format=%d-%m-%Y
+#  [Return]  ${result}
 
 
 Отримати інформацію з активу лоту
@@ -506,6 +511,24 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   ${result_full}=  Get Text  ${tender_data_${field_name}}
   ${result_full}=  Convert Date  ${result_full}  date_format=%d-%m-%Y
   [Return]  ${result_full}
+
+
+Отримати дату з рішення
+  [Arguments]  ${field_name}
+  ${result_full}=  Get Text  ${lot_data_${field_name}}
+  ${result_full}=  Split String  ${result_full}  -
+  #${result_full}=  Split String  ${result_full} '-'
+  ${day_length}=  Get Length  ${result_full[0]}
+  ${day}=  Set Variable If  '${day_length}' == '1'  0${result_full[0]}  ${result_full[0]}
+  ${month}=  Set Variable  ${result_full[1]}
+  ${year}=  Set Variable  ${result_full[2]}
+  ${result}=  Set Variable  ${year}-${month}-${day}
+  [Return]  ${result}
+
+#  Switch Browser  ${ALIAS_NAME}
+#  ${result_full}=  Get Text  ${lot_data_${field_name}}
+#  ${result_full}=  Convert Date  ${result_full}  date_format=%d-%m-%Y
+#  [Return]  ${result_full}
 
 
 Завантажити ілюстрацію в об'єкт МП
