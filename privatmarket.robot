@@ -402,6 +402,38 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   Wait Enable And Click Element  css=button[tid="btn.createasset"]
 
 
+Отримати кількість активів в об'єкті МП
+  [Arguments]  ${user_name}  ${tender_id}
+  ${count}=  Get Matching Xpath Count  //div[@ng-repeat="item in data.items"]
+  [Return]  ${count}
+
+
+Додати актив до об'єкта МП
+  [Arguments]  ${user_name}  ${tender_id}  ${item}
+  Wait Enable And Click Element  css=button[tid="btn.modifyLot"]
+  Wait Visibility And Click Element  css=button[tid="btn.additem"]
+  Sleep  1s
+  Input text  xpath=(//textarea[@tid="item.description"])[last()]  ${item.description}
+  #classification
+  Input text  xpath=(//div[@tid='classification']//input)[last()]  ${item.classification.id}
+  Wait Until Element Is Enabled  xpath=(//ul[contains(@class, 'ui-select-choices-content')])[last()]
+  Wait Enable And Click Element  xpath=//span[@class='ui-select-choices-row-inner' and contains(., '${item.classification.id}')]
+  #quantity
+  ${quantity}=  Convert To String  ${item.quantity}
+  Input text  xpath=(//input[@tid='item.quantity'])[last()]  ${quantity}
+  Select From List  xpath=(//select[@tid='item.unit.name'])[last()]  ${item.unit.name}
+  #address
+  Select Checkbox  xpath=(//input[@tid='item.address.checkbox'])[last()]
+  Input text  xpath=(//input[@tid='item.address.countryName'])[last()]  ${item.address.countryName}
+  Input text  xpath=(//input[@tid='item.address.postalCode'])[last()]  ${item.address.postalCode}
+  Input text  xpath=(//input[@tid='item.address.region'])[last()]  ${item.address.region}
+  Input text  xpath=(//input[@tid='item.address.streetAddress'])[last()]  ${item.address.streetAddress}
+  Input text  xpath=(//input[@tid='item.address.locality'])[last()]  ${item.address.locality}
+  Sleep  2s
+  Wait Enable And Click Element  css=button[tid="btn.createasset"]
+  Sleep  30s
+
+
 Login
   [Arguments]  ${username}
   Sleep  15s
