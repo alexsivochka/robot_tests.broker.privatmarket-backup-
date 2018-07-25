@@ -180,6 +180,8 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   ${quantity}=  Convert To String  ${item.quantity}
   Input text  xpath=(//input[@tid='item.quantity'])[last()]  ${quantity}
   Select From List  xpath=(//select[@tid='item.unit.name'])[last()]  ${item.unit.name}
+  Sleep  1s
+  Select From List  xpath=(//select[@tid='registrationDetails.status'])[last()]  string:${item.registrationDetails.status}
 
   #address
   Select Checkbox  xpath=(//input[@tid='item.address.checkbox'])[last()]
@@ -240,7 +242,8 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
 
 Отримати інформацію з активу лоту
   [Arguments]  ${username}  ${tender_id}  ${object_id}  ${field_name}
-  privatmarket.Отримати інформацію з активу об'єкта МП  ${username}  ${tender_id}  ${object_id}  ${field_name}
+  ${result}=  privatmarket.Отримати інформацію з активу об'єкта МП  ${username}  ${tender_id}  ${object_id}  ${field_name}
+  [Return]  ${result}
 
 
 Отримати інформацію із об'єкта МП
@@ -301,38 +304,47 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   [Arguments]  ${field_name}
   ${index}=  Get Regexp Matches  ${field_name}  [(\\d)]  0
   ${result}=  Отримати текст елемента  xpath=//div[@tid="auction.${index[0]}.tenderAttempts"]
+  ${result}=  Convert To Number  ${result}
   [Return]  ${result}
 
 
 Отримати початкову вартість аукціону
   [Arguments]  ${field_name}
   ${index}=  Get Regexp Matches  ${field_name}  [(\\d)]  0
-  ${result}=  Отримати текст елемента  xpath=//div[@tid="auction.${index[0]}.value.amount"]
+  ${result}=  Отримати текст елемента  xpath=//span[@tid="auction.${index[0]}.value.amount"]
   ${result}=  Remove String  ${result}  ${SPACE}
+  ${result}=  Replace String  ${result}  ,  .
+  ${result}=  Convert To Number  ${result}
   [Return]  ${result}
 
 
 Отримати крок аукціону
   [Arguments]  ${field_name}
   ${index}=  Get Regexp Matches  ${field_name}  [(\\d)]  0
-  ${result}=  Отримати текст елемента  xpath=//div[@tid="auction.${index[0]}.minimalStep.amount"]
+  ${result}=  Отримати текст елемента  xpath=//span[@tid="auction.${index[0]}.minimalStep.amount"]
   ${result}=  Remove String  ${result}  ${SPACE}
+  ${result}=  Replace String  ${result}  ,  .
+  ${result}=  Convert To Number  ${result}
   [Return]  ${result}
 
 
 Отримати розмір гарантійного внеску аукціону
   [Arguments]  ${field_name}
   ${index}=  Get Regexp Matches  ${field_name}  [(\\d)]  0
-  ${result}=  Отримати текст елемента  xpath=//div[@tid="auction.${index[0]}.guarantee.amount"]
+  ${result}=  Отримати текст елемента  xpath=//span[@tid="auction.${index[0]}.guarantee.amount"]
   ${result}=  Remove String  ${result}  ${SPACE}
+  ${result}=  Replace String  ${result}  ,  .
+  ${result}=  Convert To Number  ${result}
   [Return]  ${result}
 
 
 Отримати розмір реєстраційного внеску аукціону
   [Arguments]  ${field_name}
   ${index}=  Get Regexp Matches  ${field_name}  [(\\d)]  0
-  ${result}=  Отримати текст елемента  xpath=//div[@tid="auction.${index[0]}.registrationFee.amount"]
+  ${result}=  Отримати текст елемента  xpath=//span[@tid="auction.${index[0]}.registrationFee.amount"]
   ${result}=  Remove String  ${result}  ${SPACE}
+  ${result}=  Replace String  ${result}  ,  .
+  ${result}=  Convert To Number  ${result}
   [Return]  ${result}
 
 
@@ -346,8 +358,7 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
 Отримати дату початку аукціону
   [Arguments]  ${field_name}
   ${index}=  Get Regexp Matches  ${field_name}  [(\\d)]  0
-  ${result}=  Отримати текст елемента  xpath=//div[@tid="auction.${index[0]}.auctionPeriod.startDate"]
-  ${result}=  Remove String  ${result}  ${SPACE}
+  ${result}=  Get Element Attribute  xpath=//div[@tid="auction.${index[0]}.auctionPeriod.startDate"]@tidvalue
   [Return]  ${result}
 
 
