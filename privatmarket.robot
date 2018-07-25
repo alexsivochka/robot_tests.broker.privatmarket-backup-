@@ -334,8 +334,7 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
 Отримати період на подачу пропозицій
   [Arguments]  ${field_name}
   ${index}=  Get Regexp Matches  ${field_name}  [(\d)]  1
-  ${result}=  Отримати текст елемента  xpath=//div[@tid="auction.${index}.tenderingDuration"]
-  ${result}=  Remove String  ${result}  ${SPACE}
+  ${result}=  Get Element Attribute  xpath=//div[@tid="auction.${index}.tenderingDuration"]@tidvalue
   [Return]  ${result}
 
 
