@@ -16,7 +16,7 @@ ${tender_data_dateModified}  xpath=//div[@tid='modifyDate']
 ${tender_data_rectificationPeriod.endDate}  xpath=(//div[contains(@class, 'timeleft')])[1]
 ${tender_data_documents[0].documentType}  xpath=//span[@tid='data.informationDetailstitle']/ancestor::div[1]
 
-${lot_data_lotID}  xpath=//div[@tid='assetID']
+${lot_data_lotID}  xpath=//div[@tid='lotID']
 ${lot_data_title}  xpath=//div[@tid='data.title']
 ${lot_data_description}  xpath=//div[@tid='description']
 
