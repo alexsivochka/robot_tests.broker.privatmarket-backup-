@@ -18,6 +18,7 @@ ${tender_data_documents[0].documentType}  xpath=//span[@tid='data.informationDet
 
 ${lot_data_lotID}  xpath=//div[@tid='lotID']
 ${lot_data_date}  xpath=//div[@tid='date']
+${lot_data_dateModified}  xpath=//div[@tid='modifyDate']
 ${lot_data_title}  xpath=//div[@tid='data.title']
 ${lot_data_rectificationPeriod.endDate}  xpath=//div[@tid='data.rectificationPeriod.endDate']
 ${lot_data_description}  xpath=//div[@tid='description']
@@ -488,7 +489,7 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   ...  '${text}' == 'Аукціон завершено. Об’єкт не продано'  pending.dissolution
   ...  '${text}' == 'Об’єкт продано'  sold
   ...  '${text}' == 'Об’єкт не продано'  dissolved
-  ...  '${text}' == 'Об’єкт виключено'  deleted
+  ...  '${text}' == 'Об’єкт виключено з переліку'  deleted
   ...  ${element}
   [Return]  ${result}
 
