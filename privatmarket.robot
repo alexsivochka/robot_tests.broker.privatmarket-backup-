@@ -622,9 +622,11 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   Input text  xpath=(//input[@tid='item.address.region'])[last()]  ${item.address.region}
   Input text  xpath=(//input[@tid='item.address.streetAddress'])[last()]  ${item.address.streetAddress}
   Input text  xpath=(//input[@tid='item.address.locality'])[last()]  ${item.address.locality}
-  Sleep  2s
+  Sleep  1s
+  Select From List  xpath=(//select[@tid='registrationDetails.status'])[last()]  string:${item.registrationDetails.status}
+  Sleep  1s
   Wait Enable And Click Element  css=button[tid="btn.createasset"]
-  Sleep  30s
+  Wait For Element With Reload  xpath=//div[text()='${item.description}']
 
 
 Login
