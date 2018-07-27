@@ -84,7 +84,6 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
 
   Set Window Size  @{USERS.users['${username}'].size}
   Set Window Position  @{USERS.users['${username}'].position}
-#  Set Selenium Implicit Wait  10s
   Go To  ${USERS.users['${username}'].homepage}
   Run Keyword Unless  'Viewer' in '${username}'  Login  ${username}
 
@@ -92,7 +91,7 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
 Підготувати дані для оголошення тендера
   [Arguments]  ${username}  ${tender_data}  ${role_name}
   Run Keyword If  '${role_name}' != 'tender_owner'  Return From Keyword  ${tender_data}
-  ${tender_data}=  privatmarket_service.modify_test_data  ${tender_data}
+  ${tender_data}=  modify_test_data  ${tender_data}
   [Return]  ${tender_data}
 
 
@@ -406,7 +405,7 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   ${doc}=  Set Variable  xpath=//div[@id='fileitem' and contains(., '${doc_id}')]
   ${file_name}=  Get Element Attribute  ${doc}@title
   ${file_url}=  Get Element Attribute  ${doc}@url
-  download_file_from_url  ${file_url}  ${OUTPUT_DIR}${/}${file_name}
+  openprocurement_client_helper.download_file_from_url  ${file_url}  ${OUTPUT_DIR}${/}${file_name}
   Sleep  5s
   [Return]  ${file_name}
 
@@ -492,24 +491,6 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   ...  '${text}' == 'Об’єкт виключено з переліку'  deleted
   ...  ${element}
   [Return]  ${result}
-
-
-#Отримати тип документа
-#  [Arguments]  ${element}
-#  Reload Page
-#  Sleep  5s
-#  #${element_text}=  Get Text  xpath=//span[@tid='data.statusName']/span[1]  # !!! ПОДОБРАТЬ ЛОКАТОР !!!
-#  ${text}=  Strip String  ${element_text}
-#  ${text}=  Replace String  ${text}  ${\n}  ${EMPTY}
-#  ${result}=  Set Variable If
-#  ...  '${text}' == 'Рішення про затвердження переліку об’єктів, що підлягають приватизації'  notice
-#  ...  '${text}' == 'Інформація про об’єкт малої приватизації'  technicalSpecifications
-#  ...  '${text}' == 'Ілюстрації'  illustration
-#  ...  '${text}' == 'Презентація'  x_presentation
-#  ...  '${text}' == 'Додаткова інформація'  informationDetails
-#  ...  '${text}' == 'Виключення з переліку'  cancellationDetails
-#  ...  ${element}
-#  [Return]  ${result}
 
 
 Отримати дату
