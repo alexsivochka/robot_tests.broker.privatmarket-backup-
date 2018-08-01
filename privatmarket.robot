@@ -102,6 +102,9 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   ${items}=  Get From Dictionary  ${tender_data.data}  items
   ${items_number}=  Get Length  ${items}
 
+  Execute Javascript  angular.prozorroaccelerator=1440;
+  Execute Javascript  angular.prozorroauctionstartdelay = (30+180)*60*1000;
+
   Wait Enable And Click Element  css=#simple-dropdown
   Wait Enable And Click Element  css=a[href='#/add-asset']
   Wait Until Element Is Visible  css=input[tid="asset.title"]  ${COMMONWAIT}
@@ -164,6 +167,7 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   Wait Until Element Is Enabled  xpath=//input[@tid='decision.id']  ${COMMONWAIT}
   Input text  xpath=//input[@tid='decision.id']  ${decisions_id}
   Click Element  xpath=//button[@tid='btn.createaInfo']
+  Wait For Ajax
   Execute Javascript  document.querySelector("span[tid='lotID']").className = ''
   sleep  2
   ${tender_id}=  Get Element Attribute  xpath=//span[@tid='lotID']@data-id
@@ -185,9 +189,9 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   ${guarantee}=  Convert To String  ${tender_data.guarantee.amount}
   ${minimalStep}=  Convert To String  ${tender_data.minimalStep.amount}
   ${registrationFee}=  Convert To String  ${tender_data.registrationFee.amount}
+  Wait Enable And Click Element  css=input[tid='valueAddedTaxIncluded']
   Wait Until Element Is Visible  css=input[tid='auction.value']  ${COMMONWAIT}
   Input Text  css=input[tid='auction.value']  ${value}
-  Click Element  css=input[tid='valueAddedTaxIncluded']
   Input Text  css=input[tid='auction.guarantee']  ${guarantee}
   Input Text  css=input[tid='auction.minimalStep']  ${minimalStep}
   Input Text  css=input[tid='auction.period']  ${correctDate}
@@ -203,6 +207,7 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   ${duration}=  Get From Dictionary  ${tender_data}  tenderingDuration
   ${count}=  Set Variable If  '${duration}' == 'P1M'  30
   Input Text  xpath=//input[@tid='auction.tenderingDuration']  ${count}
+  debug
   Click Element  xpath=//button[@tid='btn.createInfo']
 
 
@@ -219,14 +224,6 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
 
   Input text  xpath=(//input[@tid="decision.date"])[last()]  ${correctDate}
   Input text  xpath=(//input[@tid="decision.id"])[last()]  ${decision.decisionID}
-
-
-Завантажити ілюстрацію в лот
-  [Arguments]  ${username}  ${tender_id}  ${image_path}
-  privatmarket.Пошук лоту по ідентифікатору  ${user_name}  ${tender_id}
-  Wait Enable And Click Element  xpath=//button[tid='editLot']
-  debug
-
 
 
 Додати об'єкт продажу
@@ -482,12 +479,14 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   Sleep  5s
   debug
   Wait Enable And Click Element  xpath=//button[@tid='btn.modifyLot']
+  ${value}=  Run Keyword If  'amount' in '${field_name}'  Convert To String  ${value}
+  ${correct_date}=  Run Keyword If  '${field_name}' = 'auctionPeriod.startDate'  Convert Date Format  ${value}
   Run Keyword If
     ...  '${field_name}' == 'value.amount'  Внести зміни в поле  xpath=(//input[@tid='auction.value'])  ${value}
     ...  ELSE IF  '${field_name}' == 'minimalStep.amount'  Внести зміни в поле  xpath=(//input[@tid='auction.minimalStep'])  ${value}
     ...  ELSE IF  '${field_name}' == 'guarantee.amount'  Внести зміни в поле  xpath=(//input[@tid='auction.guarantee'])  ${value}
     ...  ELSE IF  '${field_name}' == 'registrationFee.amount'  Внести зміни в поле  xpath=(//input[@tid='auction.registrationFee'])  ${value}
-    ...  ELSE IF  '${field_name}' == 'auctionPeriod.startDate'  Внести зміни в поле  xpath=(//input[@tid='auction.period'])  ${value}
+    ...  ELSE IF  '${field_name}' == 'auctionPeriod.startDate'  Внести зміни в поле  xpath=(//input[@tid='auction.period'])  ${correct_date}
 
 
 Видалити об'єкт МП
@@ -642,6 +641,24 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   Wait Enable And Click Element  css=button[tid="btn.createasset"]
 
 
+Завантажити ілюстрацію в лот
+  [Arguments]  ${username}  ${tender_id}  ${image_path}
+  privatmarket.Пошук лоту по ідентифікатору  ${user_name}  ${tender_id}
+  debug
+  Wait Enable And Click Element  xpath=//button[tid='editLot']
+  debug
+  Execute Javascript  document.querySelector("input[id='input-doc-lot']").className = ''
+  Sleep  2s
+  Choose File  css=input[id='input-doc-lot']  ${image_path}
+  Sleep  10s
+  debug
+  Wait Until Element Is Visible  css=select[tid="doc.type"]
+  Select From List  css=select[tid="doc.type"]  string:illustration
+  Sleep  2s
+  debug
+  Wait Enable And Click Element  css=button[tid="btn.createlot"]
+
+
 Завантажити документ в об'єкт МП з типом
   [Arguments]  ${user_name}  ${tender_id}  ${file_path}  ${doc_type}
   Wait Enable And Click Element  css=button[tid="btn.modifyLot"]
@@ -658,14 +675,25 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
 
 Завантажити документ в лот з типом
   [Arguments]  ${user_name}  ${tender_id}  ${file_path}  ${doc_type}
+  privatmarket.Пошук лоту по ідентифікатору  ${user_name}  ${tender_id}
   debug
-  Wait Enable And Click Element  css=button[tid="btn.modifyLot"]
+  Wait Enable And Click Element  css=button[tid="editLot"]
   debug
+  Execute Javascript  document.querySelector("input[id='input-doc-lot']").className = ''
+  Sleep  2s
+  Choose File  css=input[id='input-doc-lot']  ${file_path}
+  Sleep  10s
+  debug
+  Wait Until Element Is Visible  xpath=(//select[@tid="doc.type"])[last()]
+  Select From List  xpath=(//select[@tid="doc.type"])[last()]  string:${doc_type}
+  Sleep  2s
+  debug
+  Wait Enable And Click Element  css=button[tid="btn.createlot"]
 
 
 Завантажити документ в умови проведення аукціону
-    [Arguments]  ${user_name}  ${tender_id}  ${file_path}  ${doc_type}  ${auction_index}
-    privatmarket.Завантажити документ в лот з типом  ${user_name}  ${tender_id}  ${file_path}  ${doc_type}
+  [Arguments]  ${user_name}  ${tender_id}  ${file_path}  ${doc_type}  ${auction_index}
+  privatmarket.Завантажити документ в лот з типом  ${user_name}  ${tender_id}  ${file_path}  ${doc_type}
 
 
 Завантажити документ для видалення об'єкта МП
