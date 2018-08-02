@@ -592,7 +592,7 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   ...  '${text}' == 'Аукціон завершено. Об’єкт не продано'  pending.dissolution
   ...  '${text}' == 'Об’єкт продано'  sold
   ...  '${text}' == 'Об’єкт не продано'  dissolved
-  ...  '${text}' == 'Об’єкт виключено з переліку'  deleted
+  ...  '${text}' == 'Об’єкт виключено'  deleted
   ...  ${element}
   [Return]  ${result}
 
