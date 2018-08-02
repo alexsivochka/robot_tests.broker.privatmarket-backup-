@@ -163,8 +163,7 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   Input text  xpath=//input[@tid='decision.date']  ${correctDate}
   Wait Until Element Is Enabled  xpath=//input[@tid='decision.id']  ${COMMONWAIT}
   Input text  xpath=//input[@tid='decision.id']  ${decisions_id}
-  #Execute Javascript  angular.prozorroaccelerator=1440
-  #Execute Javascript  angular.prozorroauctionstartdelay = (30+180)*60*1000;
+  Execute Javascript  angular.prozorroaccelerator=240
   Click Element  xpath=//button[@tid='btn.createaInfo']
   Wait For Ajax
   Execute Javascript  document.querySelector("span[tid='lotID']").className = ''
