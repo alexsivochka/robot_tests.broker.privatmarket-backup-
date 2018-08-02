@@ -102,8 +102,6 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   ${items}=  Get From Dictionary  ${tender_data.data}  items
   ${items_number}=  Get Length  ${items}
 
-  #Execute Javascript  angular.prozorroaccelerator=1440;
-
   Wait Enable And Click Element  css=#simple-dropdown
   Wait Enable And Click Element  css=a[href='#/add-asset']
   Wait Until Element Is Visible  css=input[tid="asset.title"]  ${COMMONWAIT}
@@ -158,9 +156,6 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   [Arguments]  ${user_name}  ${tender_data}  ${asset_id}
   ${decisions_date}=  Get From Dictionary  ${tender_data.data.decisions[0]}  decisionDate
   ${decisions_id}=  Get From Dictionary  ${tender_data.data.decisions[0]}  decisionID
-
-  #Execute Javascript  angular.prozorroaccelerator=1440;
-
   privatmarket.Пошук об’єкта МП по ідентифікатору  ${user_name}  ${asset_id}
   Wait Enable And Click Element  css=button[tid='btn.createInfo']
   ${correctDate}=  Convert Date  ${decisions_date}  result_format=%d/%m/%Y
@@ -438,15 +433,10 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   Reload Page
   Sleep  5s
   Wait Enable And Click Element  xpath=//button[@tid='btn.modifyLot']
+  Завантажити документ про зміни  ${username}  ${tender_id}
   Run Keyword If
     ...  '${field_name}' == 'title'  Внести зміни в поле  css=input[tid='lot.title']  ${value}
     ...  ELSE IF  '${field_name}' == 'description'  Внести зміни в поле  css=textarea[tid="lot.description"]  ${value}
-
-#    ...  ELSE IF  '${field_name}'== 'decisions[0].decisionDate'  Внести зміни в поле  xpath=(//input[@tid="decision.0.decisionDate"])  ${value}
-#    ...  ELSE IF  '${field_name}'== 'decisions[0].decisionID'  Внести зміни в поле  xpath=(//input[@tid="decisions[0].decisionID"])  ${value}
-#    ...  ELSE IF  '${field_name}'== 'decisions[1].decisionDate'  Внести зміни в поле  xpath=(//input[@tid="decisions[1].decisionDate"])  ${value}
-#    ...  ELSE IF  '${field_name}'== 'decisions[1].decisionID'  Внести зміни в поле  xpath=(//input[@tid="decisions[1].decisionID"])  ${value}
-#    ...  ELSE IF  '${field_name}'== 'lotCustodian.contactPoint.name'  Внести зміни в поле  xpath=(//input[@tid="lotCustodian.contactPoint.name"])  ${value}
 
 
 Внести зміни в актив об'єкта МП
@@ -465,13 +455,10 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   Reload Page
   Sleep  5s
   Wait Enable And Click Element  xpath=//button[@tid='btn.modifyLot']
+  Завантажити документ про зміни  ${username}  ${tender_id}
   ${quantity}=  Run Keyword If  '${field_name}' == 'quantity'  Convert To String  ${value}
   Run Keyword If
     ...  '${field_name}' == 'quantity'  Внести зміни в поле  xpath=(//input[@tid='item.quantity'])  ${quantity}
-
-#    ...  ELSE IF  '${field_name}' == 'classification.id'  Внести зміни в поле  css=textarea[tid="classification.id"]  ${value}
-#    ...  ELSE IF  '${field_name}' == 'unit.name'  Внести зміни в поле  xpath=(//input[@tid='unit.name'])  ${value}
-#    ...  ELSE IF  '${field_name}' == 'registrationDetails.status'  Внести зміни в поле  xpath=(//input[@tid='registrationDetails.status'])  ${value}
 
 
 Внести зміни в умови проведення аукціону
@@ -479,14 +466,16 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   Reload Page
   Sleep  5s
   Wait Enable And Click Element  xpath=//button[@tid='btn.modifyLot']
-  ${value}=  Run Keyword If  'amount' in '${field_name}'  Convert To String  ${value}
-  ${correct_date}=  Run Keyword If  '${field_name}' = 'auctionPeriod.startDate'  Convert Date Format  ${value}
+  Завантажити документ про зміни  ${username}  ${tender_id}
+  ${correct_value}=  Run Keyword If
+    ...  'amount' in '${field_name}'  Convert To String  ${value}
+    ...  ELSE IF  '${field_name}' = 'auctionPeriod.startDate'  Convert Date Format  ${value}
   Run Keyword If
-    ...  '${field_name}' == 'value.amount'  Внести зміни в поле  xpath=(//input[@tid='auction.value'])  ${value}
-    ...  ELSE IF  '${field_name}' == 'minimalStep.amount'  Внести зміни в поле  xpath=(//input[@tid='auction.minimalStep'])  ${value}
-    ...  ELSE IF  '${field_name}' == 'guarantee.amount'  Внести зміни в поле  xpath=(//input[@tid='auction.guarantee'])  ${value}
-    ...  ELSE IF  '${field_name}' == 'registrationFee.amount'  Внести зміни в поле  xpath=(//input[@tid='auction.registrationFee'])  ${value}
-    ...  ELSE IF  '${field_name}' == 'auctionPeriod.startDate'  Внести зміни в поле  xpath=(//input[@tid='auction.period'])  ${correct_date}
+    ...  '${field_name}' == 'value.amount'  Внести зміни в поле  xpath=(//input[@tid='auction.value'])  ${correct_value}
+    ...  ELSE IF  '${field_name}' == 'minimalStep.amount'  Внести зміни в поле  xpath=(//input[@tid='auction.minimalStep'])  ${correct_value}
+    ...  ELSE IF  '${field_name}' == 'guarantee.amount'  Внести зміни в поле  xpath=(//input[@tid='auction.guarantee'])  ${correct_value}
+    ...  ELSE IF  '${field_name}' == 'registrationFee.amount'  Внести зміни в поле  xpath=(//input[@tid='auction.registrationFee'])  ${correct_value}
+    ...  ELSE IF  '${field_name}' == 'auctionPeriod.startDate'  Внести зміни в поле  xpath=(//input[@tid='auction.period'])  ${correct_value}
 
 
 Видалити об'єкт МП
@@ -500,11 +489,9 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
 
 Видалити лот
   [Arguments]  ${user_name}  ${tender_id}
+  Switch Browser  ${ALIAS_NAME}
   Reload Page
-  Sleep  5s
-  Wait Enable And Click Element  css=button[tid='btn.cancellationLot']
-  Wait Enable And Click Element  css=button[tid='defaultOk']
-  Wait Until Page Contains  Об’єкт виключено з переліку  20
+  Wait Until Page Contains  Об’єкт виключено з переліку  60
 
 
 Внести зміни в поле
@@ -629,6 +616,18 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   [Return]  ${result}
 
 
+Завантажити документ про зміни
+  [Arguments]  ${username}    ${tender_id}
+  ${file_path}  ${file_name}  ${file_content}=  create_fake_doc
+  Execute Javascript  document.querySelector("input[id='input-doc-info']").className = ''
+  Sleep  2s
+  Choose File  css=input[id='input-doc-info']  ${file_path}
+  Sleep  10s
+  Wait Until Element Is Visible  xpath=(//select[@tid="doc.type"])[last()]
+  Select From List  xpath=(//select[@tid="doc.type"])[last()]  string:technicalSpecifications
+  Sleep  2s
+
+
 Завантажити ілюстрацію в об'єкт МП
   [Arguments]  ${user_name}  ${tender_id}  ${image_path}
   Wait Enable And Click Element  css=button[tid="btn.modifyLot"]
@@ -645,7 +644,6 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
 
 Завантажити ілюстрацію в лот
   [Arguments]  ${username}  ${tender_id}  ${image_path}
-  #privatmarket.Пошук лоту по ідентифікатору  ${user_name}  ${tender_id}
   Wait Enable And Click Element  css=button[tid="btn.modifyLot"]
   Execute Javascript  document.querySelector("input[id='input-doc-info']").className = ''
   Sleep  2s
@@ -673,7 +671,6 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
 
 Завантажити документ в лот з типом
   [Arguments]  ${user_name}  ${tender_id}  ${file_path}  ${doc_type}
-  #privatmarket.Пошук лоту по ідентифікатору  ${user_name}  ${tender_id}
   Wait Enable And Click Element  css=button[tid="btn.modifyLot"]
   Execute Javascript  document.querySelector("input[id='input-doc-info']").className = ''
   Sleep  2s
@@ -706,16 +703,12 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
 
 Завантажити документ для видалення лоту
   [Arguments]  ${user_name}  ${tender_id}  ${file_path}
-  #privatmarket.Пошук лоту по ідентифікатору  ${user_name}  ${tender_id}
-  Wait Enable And Click Element  css=button[tid="btn.modifyLot"]
-  Execute Javascript  document.querySelector("input[id='input-doc-info']").className = ''
+  Wait Enable And Click Element  css=button[tid="btn.cancellationLot"]
+  Execute Javascript  document.querySelector("input[id='docsCancellation']").className = ''
   Sleep  2s
-  Choose File  css=input[id='input-doc-info']  ${file_path}
+  Choose File  css=input[id='docsCancellation']  ${file_path}
   Sleep  10s
-  Wait Until Element Is Visible  xpath=(//select[@tid="doc.type"])[last()]
-  Select From List  xpath=(//select[@tid="doc.type"])[last()]  string:cancellationDetails
-  Sleep  2s
-  Wait Enable And Click Element  css=button[tid="btn.createInfo"]
+  Wait Enable And Click Element  css=button[tid='btn.cancellation']
 
 
 Отримати кількість активів в об'єкті МП
