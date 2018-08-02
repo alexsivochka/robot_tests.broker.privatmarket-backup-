@@ -163,6 +163,8 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   Input text  xpath=//input[@tid='decision.date']  ${correctDate}
   Wait Until Element Is Enabled  xpath=//input[@tid='decision.id']  ${COMMONWAIT}
   Input text  xpath=//input[@tid='decision.id']  ${decisions_id}
+  #Execute Javascript  angular.prozorroaccelerator=1440
+  #Execute Javascript  angular.prozorroauctionstartdelay = (30+180)*60*1000;
   Click Element  xpath=//button[@tid='btn.createaInfo']
   Wait For Ajax
   Execute Javascript  document.querySelector("span[tid='lotID']").className = ''
@@ -205,6 +207,7 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   ${count}=  Set Variable If  '${duration}' == 'P1M'  30
   Input Text  xpath=//input[@tid='auction.tenderingDuration']  ${count}
   Click Element  xpath=//button[@tid='btn.createInfo']
+  Wait Until Element Is Visible  ${lot_data_title}  ${COMMONWAIT}
 
 
 Додати рішення
@@ -480,18 +483,16 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
 
 Видалити об'єкт МП
   [Arguments]  ${user_name}  ${tender_id}
+  Switch Browser  ${ALIAS_NAME}
   Reload Page
-  Sleep  5s
-  Wait Enable And Click Element  css=button[tid='btn.removeAsset']
-  Wait Enable And Click Element  css=button[tid='defaultOk']
-  Wait Until Page Contains  Виключено з переліку  20
+  Wait Until Page Contains  Виключено з переліку  60
 
 
 Видалити лот
   [Arguments]  ${user_name}  ${tender_id}
   Switch Browser  ${ALIAS_NAME}
   Reload Page
-  Wait Until Page Contains  Об’єкт виключено з переліку  60
+  Wait Until Page Contains  Об’єкт виключено  60
 
 
 Внести зміни в поле
@@ -689,26 +690,17 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
 
 Завантажити документ для видалення об'єкта МП
   [Arguments]  ${user_name}  ${tender_id}  ${file_path}
-  Wait Enable And Click Element  css=button[tid="btn.modifyLot"]
-  Wait Until Element Is Visible  css=button[tid="btn.createasset"]
-  Execute Javascript  document.querySelector("input[id='input-doc-asset']").className = ''
-  Sleep  2s
-  Choose File  css=input[id='input-doc-asset']  ${file_path}
-  Sleep  10s
-  Wait Until Element Is Visible  xpath=(//select[@tid="doc.type"])[last()]
-  Select From List  xpath=(//select[@tid="doc.type"])[last()]  string:cancellationDetails
-  Sleep  2s
-  Wait Enable And Click Element  css=button[tid="btn.createasset"]
-
-
-Завантажити документ для видалення лоту
-  [Arguments]  ${user_name}  ${tender_id}  ${file_path}
   Wait Enable And Click Element  css=button[tid="btn.cancellationLot"]
   Execute Javascript  document.querySelector("input[id='docsCancellation']").className = ''
   Sleep  2s
   Choose File  css=input[id='docsCancellation']  ${file_path}
   Sleep  10s
   Wait Enable And Click Element  css=button[tid='btn.cancellation']
+
+
+Завантажити документ для видалення лоту
+  [Arguments]  ${user_name}  ${tender_id}  ${file_path}
+  privatmarket.Завантажити документ для видалення об'єкта МП  ${user_name}  ${tender_id}  ${file_path}
 
 
 Отримати кількість активів в об'єкті МП
