@@ -163,7 +163,8 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   Input text  xpath=//input[@tid='decision.date']  ${correctDate}
   Wait Until Element Is Enabled  xpath=//input[@tid='decision.id']  ${COMMONWAIT}
   Input text  xpath=//input[@tid='decision.id']  ${decisions_id}
-  Execute Javascript  angular.prozorroaccelerator=240
+  Execute Javascript  angular.prozorroaccelerator=150;
+  Execute Javascript  angular.prozorroauctionstartdelay = (30+180)*60*1000;
   Click Element  xpath=//button[@tid='btn.createaInfo']
   Wait For Ajax
   Execute Javascript  document.querySelector("span[tid='lotID']").className = ''
@@ -457,10 +458,10 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   Reload Page
   Sleep  5s
   Wait Enable And Click Element  xpath=//button[@tid='btn.modifyLot']
-  Завантажити документ про зміни  ${username}  ${tender_id}
   ${quantity}=  Run Keyword If  '${field_name}' == 'quantity'  Convert To String  ${value}
-  Run Keyword If
-    ...  '${field_name}' == 'quantity'  Внести зміни в поле  xpath=(//input[@tid='item.quantity'])  ${quantity}
+  Run Keyword If  '${field_name}' == 'quantity'  Run Keywords
+    ...  Завантажити документ про зміни  ${username}  ${tender_id}
+    ...  AND  Внести зміни в поле  xpath=(//input[@tid='item.quantity'])  ${quantity}
 
 
 Внести зміни в умови проведення аукціону
@@ -471,7 +472,7 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   Завантажити документ про зміни  ${username}  ${tender_id}
   ${correct_value}=  Run Keyword If
     ...  'amount' in '${field_name}'  Convert To String  ${value}
-    ...  ELSE IF  '${field_name}' = 'auctionPeriod.startDate'  Convert Date Format  ${value}
+    ...  ELSE IF  '${field_name}' == 'auctionPeriod.startDate'  Convert Date Format  ${value}
   Run Keyword If
     ...  '${field_name}' == 'value.amount'  Внести зміни в поле  xpath=(//input[@tid='auction.value'])  ${correct_value}
     ...  ELSE IF  '${field_name}' == 'minimalStep.amount'  Внести зміни в поле  xpath=(//input[@tid='auction.minimalStep'])  ${correct_value}
