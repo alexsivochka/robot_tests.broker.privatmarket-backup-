@@ -160,6 +160,7 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   Wait Enable And Click Element  css=button[tid='btn.createInfo']
   ${correctDate}=  Convert Date  ${decisions_date}  result_format=%d/%m/%Y
   ${correctDate}=  Convert To String  ${correctDate}
+  Wait Until Element Is Visible  xpath=//input[@tid='decision.date']  ${COMMONWAIT}
   Input text  xpath=//input[@tid='decision.date']  ${correctDate}
   Wait Until Element Is Enabled  xpath=//input[@tid='decision.id']  ${COMMONWAIT}
   Input text  xpath=//input[@tid='decision.id']  ${decisions_id}
