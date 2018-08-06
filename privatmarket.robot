@@ -440,6 +440,8 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   Run Keyword If
     ...  '${field_name}' == 'title'  Внести зміни в поле  css=input[tid='lot.title']  ${value}
     ...  ELSE IF  '${field_name}' == 'description'  Внести зміни в поле  css=textarea[tid="lot.description"]  ${value}
+  Wait Until Element Is Enabled  xpath=//button[@tid='btn.modifyLot']  ${COMMONWAIT}
+
 
 
 Внести зміни в актив об'єкта МП
@@ -462,6 +464,7 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
   Run Keyword If  '${field_name}' == 'quantity'  Run Keywords
     ...  Завантажити документ про зміни  ${username}  ${tender_id}
     ...  AND  Внести зміни в поле  xpath=(//input[@tid='item.quantity'])  ${quantity}
+  Wait Until Element Is Enabled  xpath=//button[@tid='btn.modifyLot']  ${COMMONWAIT}
 
 
 Внести зміни в умови проведення аукціону
@@ -481,7 +484,7 @@ ${tender_data.assets.registrationDetails.status}  div[@tid="item.registrationDet
     ...  ELSE IF  '${field_name}' == 'registrationFee.amount'  Внести зміни в поле  xpath=(//input[@tid='auction.registrationFee'])  ${correct_value}
     ...  ELSE IF  '${field_name}' == 'auctionPeriod.startDate'  Змінити дату аукціону  ${correct_value}
     ...  ELSE IF  '${field_name}' == 'auctionPeriod.startDate'  Внести зміни в поле  xpath=(//input[@tid='auction.period'])  ${correct_value}
-  Element Should Be Enabled  xpath=//button[@tid='btn.modifyLot']
+  Wait Until Element Is Enabled  xpath=//button[@tid='btn.modifyLot']  ${COMMONWAIT}
 
 
 Видалити об'єкт МП
